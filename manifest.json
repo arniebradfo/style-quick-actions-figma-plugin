@@ -1,0 +1,23 @@
+{
+	"name": "Style Quick Actions",
+	"id": "1204115040413669976",
+	"api": "1.0.0",
+	"main": "dist/main.js",
+	"editorType": ["figma"],
+	"parameters": [
+		{
+			"name": "Command",
+			"key": "parameterOne",
+			"description": "Whatchu doin'?",
+			"allowFreeform": false,
+			"optional": false
+		},
+		{
+			"name": "...",
+			"key": "parameterTwo",
+			"description": "Whatchu pickin'?",
+			"allowFreeform": false,
+			"optional": false
+		}
+	]
+}

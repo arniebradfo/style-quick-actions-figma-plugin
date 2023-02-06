@@ -1,0 +1,10 @@
+.gitconfig
+.DS_Store
+
+# node / yarn
+*.log
+*.log.*
+node_modules
+
+out/
+dist/
