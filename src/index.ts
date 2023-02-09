@@ -9,18 +9,18 @@ figma.on('run', (event: RunEvent) => {
 	// console.log(figma.currentPage.selection[0]);
 
 	const command = event.command;
-	const parameters = event.parameters as ParametersType; 
+	const parameters = event.parameters as ParametersType;
 	console.log({ command, parameters });
-	const {parameterOne, parameterTwo} = event.parameters as ParametersType
+	const { parameterOne, parameterTwo } = event.parameters as ParametersType;
 
 	switch (parameterOne) {
 		case Command.Fill:
-			console.log(figma.getStyleById(parameterTwo))
+			console.log(figma.getStyleById(parameterTwo));
 			break;
 		case Command.Stroke:
-			console.log(figma.getStyleById(parameterTwo))
+			console.log(figma.getStyleById(parameterTwo));
 			break;
-		case Command.Typography:
+		case Command.Text:
 			break;
 		case Command.Effect:
 			break;
@@ -47,7 +47,7 @@ figma.on('run', (event: RunEvent) => {
 enum Command {
 	Fill,
 	Stroke,
-	Typography,
+	Text,
 	Effect,
 	Grid,
 	ToggleStyle,
@@ -57,14 +57,14 @@ enum Command {
 type CommandSuggestion = SuggestionObj<Command>;
 type Key = 'parameterOne' | 'parameterTwo';
 type ParametersType = {
-	parameterOne: Command,
-	parameterTwo: string
+	parameterOne: Command;
+	parameterTwo: string;
 };
 
 const styleTypeCommands: CommandSuggestion[] = [
 	{ name: `Fill`, data: Command.Fill },
 	{ name: `Stroke`, data: Command.Stroke },
-	{ name: `Typography`, data: Command.Typography },
+	{ name: `Typography`, data: Command.Text },
 	{ name: `Effect`, data: Command.Effect },
 	{ name: `Grid`, data: Command.Grid },
 ];
@@ -90,11 +90,14 @@ figma.parameters.on('input', ({ parameters, key: _key, query, result }: Paramete
 			case Command.Stroke:
 				setPaintSuggestions(result, query);
 				break;
-			case Command.Typography:
+			case Command.Text:
+				setTextSuggestions(result, query);
 				break;
 			case Command.Effect:
+				setEffectSuggestions(result, query);
 				break;
 			case Command.Grid:
+				setGridSuggestions(result, query);
 				break;
 			case Command.ToggleStyle:
 				break;
@@ -108,7 +111,11 @@ figma.parameters.on('input', ({ parameters, key: _key, query, result }: Paramete
 	}
 });
 function setPaintSuggestions(result: SuggestionResults, query?: string) {
-	const paintStyles = figma.getLocalPaintStyles().map((style) => ({ name: style.name, data: style.id, icon: fillPreview }));
+	const paintStyles = figma.getLocalPaintStyles().map((style) => {
+		const color = style.paints[0].type === 'SOLID' ? rgbPaintToCss(style.paints[0].color) : '#FFF';
+		const icon = fillPreview([color]);
+		return { name: style.name, data: style.id, icon };
+	});
 	result.setSuggestions(searchSuggestions(query, paintStyles));
 }
 
@@ -127,6 +134,12 @@ function setEffectSuggestions(result: SuggestionResults, query?: string) {
 	result.setSuggestions(searchSuggestions(query, effectStyles));
 }
 
-const fillPreview = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-<circle cx="8" cy="8" r="8" fill="#D9D9D9"/>
-</svg>`
+const fillPreview = (colors: string[]) =>
+	`<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">${colors
+		.map((color) => `<circle cx="8" cy="8" r="8" fill="${color}"/>`)
+		.join()}</svg>`;
+
+const rgbPaintToCss = (rgb: RGB | RGBA) => {
+	const { r, g, b, a = 1 } = rgb as RGBA;
+	return `rgb(${r * 255},${g * 255},${b * 255},${a})`;
+};
