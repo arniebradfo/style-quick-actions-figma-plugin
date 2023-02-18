@@ -1,8 +1,4 @@
-// import { autoLayoutCommandMap, autoLayoutSuggestionsMap } from './commands/auto-layout';
-// import { constraintsCommandMap, constraintsSuggestionsMap } from './commands/constraints';
-// import { extrasCommandMap, extrasSuggestionsMap } from './commands/extras';
-// import { frameCommandMap, frameSuggestionsMap } from './commands/frame';
-// import { strokeCommandMap, strokeSuggestionsMap } from './commands/stroke';
+import { svgIconPaint } from './svgIconPaint';
 import { searchSuggestions } from './utils';
 
 figma.on('run', (event: RunEvent) => {
@@ -111,11 +107,9 @@ figma.parameters.on('input', ({ parameters, key: _key, query, result }: Paramete
 	}
 });
 function setPaintSuggestions(result: SuggestionResults, query?: string) {
-	const paintStyles = figma.getLocalPaintStyles().map((style) => {
-		const color = style.paints[0].type === 'SOLID' ? rgbPaintToCss(style.paints[0].color) : '#FFF';
-		const icon = fillPreview([color]);
-		return { name: style.name, data: style.id, icon };
-	});
+	const paintStyles = figma
+		.getLocalPaintStyles()
+		.map((style) => ({ name: style.name, data: style.id, icon: svgIconPaint(style) }));
 	result.setSuggestions(searchSuggestions(query, paintStyles));
 }
 
@@ -133,13 +127,3 @@ function setEffectSuggestions(result: SuggestionResults, query?: string) {
 	const effectStyles = figma.getLocalEffectStyles().map((style) => ({ name: style.name, data: style.id }));
 	result.setSuggestions(searchSuggestions(query, effectStyles));
 }
-
-const fillPreview = (colors: string[]) =>
-	`<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">${colors
-		.map((color) => `<circle cx="8" cy="8" r="8" fill="${color}"/>`)
-		.join()}</svg>`;
-
-const rgbPaintToCss = (rgb: RGB | RGBA) => {
-	const { r, g, b, a = 1 } = rgb as RGBA;
-	return `rgb(${r * 255},${g * 255},${b * 255},${a})`;
-};
