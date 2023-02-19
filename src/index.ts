@@ -1,3 +1,4 @@
+import { svgIconEffect, svgIconGrid, svgIconText } from './svgIcon';
 import { svgIconPaint } from './svgIconPaint';
 import { searchSuggestions } from './utils';
 
@@ -107,23 +108,37 @@ figma.parameters.on('input', ({ parameters, key: _key, query, result }: Paramete
 	}
 });
 function setPaintSuggestions(result: SuggestionResults, query?: string) {
-	const paintStyles = figma
-		.getLocalPaintStyles()
-		.map((style) => ({ name: style.name, data: style.id, icon: svgIconPaint(style) }));
+	const paintStyles = figma.getLocalPaintStyles().map((style) => ({
+		name: style.name,
+		data: style.id,
+		icon: svgIconPaint(style),
+	}));
 	result.setSuggestions(searchSuggestions(query, paintStyles));
 }
 
 function setTextSuggestions(result: SuggestionResults, query?: string) {
-	const textStyles = figma.getLocalTextStyles().map((style) => ({ name: style.name, data: style.id }));
+	const textStyles = figma.getLocalTextStyles().map((style) => ({
+		name: style.name, // 00/Auto
+		data: style.id,
+		icon: svgIconText(style),
+	}));
 	result.setSuggestions(searchSuggestions(query, textStyles));
 }
 
 function setGridSuggestions(result: SuggestionResults, query?: string) {
-	const gridStyles = figma.getLocalGridStyles().map((style) => ({ name: style.name, data: style.id }));
+	const gridStyles = figma.getLocalGridStyles().map((style) => ({
+		name: style.name,
+		data: style.id,
+		icon: svgIconGrid(style),
+	}));
 	result.setSuggestions(searchSuggestions(query, gridStyles));
 }
 
 function setEffectSuggestions(result: SuggestionResults, query?: string) {
-	const effectStyles = figma.getLocalEffectStyles().map((style) => ({ name: style.name, data: style.id }));
+	const effectStyles = figma.getLocalEffectStyles().map((style) => ({
+		name: style.name,
+		data: style.id,
+		icon: svgIconEffect(style),
+	}));
 	result.setSuggestions(searchSuggestions(query, effectStyles));
 }
