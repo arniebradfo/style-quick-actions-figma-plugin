@@ -3,41 +3,60 @@ import { svgIconPaint } from './svgIconPaint';
 import { searchSuggestions } from './utils';
 
 figma.on('run', (event: RunEvent) => {
-	// console.log(figma.currentPage.selection[0]);
+	const { selection } = figma.currentPage;
+	const {command, parameters } = event;
+	const { parameterOne, parameterTwo } = parameters as ParametersType;
 
-	const command = event.command;
-	const parameters = event.parameters as ParametersType;
-	console.log({ command, parameters });
-	const { parameterOne, parameterTwo } = event.parameters as ParametersType;
+	const styleId = parameterTwo; // figma.getStyleById(parameterTwo)?.id;
+	console.log({
+		command,
+		parameters,
+		style: figma.getStyleById(parameterTwo),
+		selection,
+	});
 
 	switch (parameterOne) {
 		case Command.Fill:
-			console.log(figma.getStyleById(parameterTwo));
+			selection.forEach((node) => {
+				if ('fillStyleId' in node) node.fillStyleId = parameterTwo;
+			});
 			break;
 		case Command.Stroke:
-			console.log(figma.getStyleById(parameterTwo));
+			selection.forEach((node) => {
+				if ('strokeStyleId' in node) node.strokeStyleId = parameterTwo;
+			});
 			break;
 		case Command.Text:
+			selection.forEach((node) => {
+				if ('textStyleId' in node) node.textStyleId = parameterTwo;
+			});
 			break;
 		case Command.Effect:
+			selection.forEach((node) => {
+				if ('effectStyleId' in node) node.effectStyleId = parameterTwo;
+			});
 			break;
 		case Command.Grid:
+			selection.forEach((node) => {
+				if ('gridStyleId' in node) node.gridStyleId = parameterTwo;
+			});
 			break;
 		case Command.ToggleStyle:
+			figma.notify("Styles from 'Filename' are now available in this file");
 			break;
 		case Command.PublishStyle:
+			figma.notify(
+				"(Updated) Published styles as 'File Name'. To use these styles in another file, select the name in 'Manage Styles'."
+			);
 			break;
 		case Command.DeleteStyle:
+			figma.notify('Deleted Style');
 			break;
 		default:
+			figma.notify('Error: Invalid Command', { error: true });
 			break;
 	}
 
-	figma.notify(
-		"(Updated) Published styles as 'File Name'. To use these styles in another file, select the name in 'Manage Styles'."
-	);
-
-	// figma.currentPage.selection.forEach((node) => commandMap[command](node, parameters));
 	figma.closePlugin();
 });
 
