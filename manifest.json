@@ -4,20 +4,83 @@
 	"api": "1.0.0",
 	"main": "dist/main.js",
 	"editorType": ["figma"],
-	"parameters": [
+	"menu": [
 		{
-			"name": "Command",
-			"key": "parameterOne",
-			"description": "Whatchu doin'?",
-			"allowFreeform": false,
-			"optional": false
+			"name": "Fill",
+			"command": "fill",
+			"parameters": [
+				{
+					"name": "Style Name",
+					"key": "fill"
+				}
+			]
 		},
 		{
-			"name": "...",
-			"key": "parameterTwo",
-			"description": "Whatchu pickin'?",
-			"allowFreeform": false,
-			"optional": false
+			"name": "Stroke",
+			"command": "stroke",
+			"parameters": [
+				{
+					"name": "Style Name",
+					"key": "stroke"
+				}
+			]
+		},
+		{
+			"name": "Text",
+			"command": "text",
+			"parameters": [
+				{
+					"name": "Style Name",
+					"key": "text"
+				}
+			]
+		},
+		{
+			"name": "Effect",
+			"command": "effect",
+			"parameters": [
+				{
+					"name": "Style Name",
+					"key": "effect"
+				}
+			]
+		},
+		{
+			"name": "Grid",
+			"command": "grid",
+			"parameters": [
+				{
+					"name": "Style Name",
+					"key": "grid"
+				}
+			]
+		},
+		{ "separator": true },
+		{
+			"name": "Toggle Library Styles",
+			"command": "toggle",
+			"parameters": [
+				{
+					"description": "Toggle a published library style to make it available in this file.",
+					"name": "Name",
+					"key": "toggle"
+				}
+			]
+		},
+		{
+			"name": "Publish Library Styles",
+			"command": "publish"
+		},
+		{
+			"name": "Remove Library Styles",
+			"command": "delete",
+			"parameters": [
+				{
+					"description": "Select a library style to remove from this plugin.",
+					"name": "Name",
+					"key": "delete"
+				}
+			]
 		}
 	]
 }
