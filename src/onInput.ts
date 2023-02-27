@@ -1,9 +1,9 @@
-import { setToggleStyleSuggestions } from './manageStyles';
+import { setLibraryStyleSuggestions } from './manageStyles';
 import { svgIconEffect, svgIconGrid, svgIconText } from './svgIcon';
 import { svgIconPaint } from './svgIconPaint';
 import { searchSuggestions, Command, Key } from './utils';
 
-export const onInput = ({ parameters, key: _key, query, result }: ParameterInputEvent) => {
+export const onInput = async ({ parameters, key: _key, query, result }: ParameterInputEvent) => {
 	const key = _key as Key;
 	console.log({ parameters, key, query, result });
 	switch (key) {
@@ -23,11 +23,12 @@ export const onInput = ({ parameters, key: _key, query, result }: ParameterInput
 			setGridSuggestions(result, query);
 			break;
 		case Command.ToggleStyle:
-			setToggleStyleSuggestions(result, query);
+			await setLibraryStyleSuggestions(result, query, true);
 			break;
 		case Command.PublishStyle:
 			break;
 		case Command.DeleteStyle:
+			await setLibraryStyleSuggestions(result, query);
 			break;
 		default:
 			break;

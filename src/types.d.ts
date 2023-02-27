@@ -5,4 +5,12 @@ interface SuggestionObj<Data = any> {
 	iconUrl?: string;
 }
 
-type Suggestion<Data = any> = SuggestionObj<Data> | string
+interface StyleClientStorage {
+	paint: string[];
+	text: string[];
+	effect: string[];
+	grid: string[];
+	saved: number;
+}
+
+type Suggestion<Data = any> = SuggestionObj<Data> | string;

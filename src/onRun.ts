@@ -1,7 +1,7 @@
 import { Command } from './utils';
 import { deleteStyles, publishStyles, toggleStyles } from './manageStyles';
 
-export const onRun = (event: RunEvent) => {
+export const onRun = async (event: RunEvent) => {
 	const { selection } = figma.currentPage;
 	const { command, parameters } = event as _RunEvent;
 	const styleId = parameters?.[command] || '';
@@ -40,13 +40,13 @@ export const onRun = (event: RunEvent) => {
 			});
 			break;
 		case Command.ToggleStyle:
-			toggleStyles(styleId);
+			await toggleStyles(styleId);
 			break;
 		case Command.PublishStyle:
-			publishStyles();
+			await publishStyles();
 			break;
 		case Command.DeleteStyle:
-			deleteStyles(styleId);
+			await deleteStyles(styleId);
 			break;
 		default:
 			figma.notify('Error: Invalid Command', { error: true });
