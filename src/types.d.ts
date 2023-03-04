@@ -12,5 +12,6 @@ interface StyleClientStorage {
 	grid: string[];
 	saved: number;
 }
+type StyleClientStorageType = keyof Omit<StyleClientStorage, 'saved'>
 
 type Suggestion<Data = any> = SuggestionObj<Data> | string;

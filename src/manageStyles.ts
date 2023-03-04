@@ -12,6 +12,7 @@ export async function publishStyles() {
 
 	const fileName = figma.root.name;
 	console.log({ fileName, styles });
+	console.log(JSON.stringify(styles)); // to test file size
 
 	const isUpdating = (await figma.clientStorage.getAsync(fileName)) != null;
 	await figma.clientStorage.setAsync(fileName, styles);
@@ -25,7 +26,7 @@ export async function toggleStyles(libraryStyleId: string) {
 	// figma.root.getPluginData();
 	const hasLibraryStyleId = toggleLocalStylesList(libraryStyleId);
 	figma.notify(
-		`Library Styles from '${libraryStyleId}' are toggled ${hasLibraryStyleId ? 'on' : 'off'} in this file.`
+		`Library Styles from '${libraryStyleId}' are toggled ${hasLibraryStyleId ? 'ON' : 'OFF'} in this file.`
 	);
 }
 
@@ -44,18 +45,44 @@ export async function setLibraryStyleSuggestions(result: SuggestionResults, quer
 }
 
 export async function deleteStyles(libraryStyleId: string) {
-	// figma.notify(`Deleting Library Style '${styleId}'...`);
-	// await figma.clientStorage.deleteAsync(styleId);
-	// removeFromLocalStylesList(styleId);
-	// figma.notify(`Deleted Library Style '${styleId}'`);
-
-	const styleClientStorage = (await figma.clientStorage.getAsync(libraryStyleId)) as StyleClientStorage;
-	const testStyle = await figma.importStyleByKeyAsync(styleClientStorage.paint[0]);
-	console.log({ testStyle });
+	figma.notify(`Deleting Library Style '${libraryStyleId}'...`);
+	await figma.clientStorage.deleteAsync(libraryStyleId);
+	removeFromLocalStylesList(libraryStyleId);
+	figma.notify(`Deleted Library Style '${libraryStyleId}'`);
 }
 
-export async function getLibraryStyles(libraryStyleId: string) {}
+export async function getLibraryStyles(libraryStyleId: string, type: StyleClientStorageType) {
+	const styleClientStorage = (await figma.clientStorage.getAsync(libraryStyleId)) as StyleClientStorage;
 
+	const styleType = styleClientStorage[type];
+	const styles: BaseStyle[] = [];
+	for (let i = 0; i < styleType.length; i++) {
+		const styleKey = styleType[i];
+		const style = await figma.importStyleByKeyAsync(styleKey);
+		console.log({ style, i, t: styleType.length });
+		styles.push(style);
+		if (i > 50) break;
+	}
+	return styles;
+}
+export async function getLocalLibraryStyles(type: StyleClientStorageType) {
+	const localStylesList = getLocalStylesList();
+	console.log({ localStylesList });
+
+	const styles: BaseStyle[] = [];
+	for (let i = 0; i < localStylesList.length; i++) {
+		const libraryStyleId = localStylesList[i];
+		const style = await getLibraryStyles(libraryStyleId, type);
+		// console.log({ style });
+
+		styles.push(...style);
+	}
+	return styles;
+}
+export const getLibraryPaintStyles = async () => getLocalLibraryStyles('paint') as Promise<PaintStyle[]>;
+export const getLibraryGridStyles = async () => getLocalLibraryStyles('grid') as Promise<GridStyle[]>;
+export const getLibraryEffectStyles = async () => getLocalLibraryStyles('effect') as Promise<EffectStyle[]>;
+export const getLibraryTextStyles = async () => getLocalLibraryStyles('text') as Promise<TextStyle[]>;
 ////////
 
 export const localStylesListKey = 'thing';
