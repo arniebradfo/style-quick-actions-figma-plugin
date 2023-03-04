@@ -1,12 +1,14 @@
 import { svgIconCheckbox } from './svgIcon';
 import { searchSuggestions } from './utils';
 
-export async function publishStyles() {
+const mapStyleToClientStorage = (style: BaseStyle) => [style.key, style.name] as StorageStyle;
+
+export async function publishLibraryStyles() {
 	const styles: StyleClientStorage = {
-		paint: figma.getLocalPaintStyles().map(mapStyleKey),
-		text: figma.getLocalTextStyles().map(mapStyleKey),
-		effect: figma.getLocalEffectStyles().map(mapStyleKey),
-		grid: figma.getLocalGridStyles().map(mapStyleKey),
+		paint: figma.getLocalPaintStyles().map(mapStyleToClientStorage),
+		text: figma.getLocalTextStyles().map(mapStyleToClientStorage),
+		effect: figma.getLocalEffectStyles().map(mapStyleToClientStorage),
+		grid: figma.getLocalGridStyles().map(mapStyleToClientStorage),
 		saved: Date.now(),
 	};
 
@@ -22,106 +24,100 @@ export async function publishStyles() {
 	);
 }
 
-export async function toggleStyles(libraryStyleId: string) {
+export async function toggleLibrary(libraryId: string) {
 	// figma.root.getPluginData();
-	const hasLibraryStyleId = toggleLocalStylesList(libraryStyleId);
-	figma.notify(
-		`Library Styles from '${libraryStyleId}' are toggled ${hasLibraryStyleId ? 'ON' : 'OFF'} in this file.`
-	);
+	const hasLibraryId = toggleActiveLibraryId(libraryId);
+	figma.notify(`Library Styles from '${libraryId}' are toggled ${hasLibraryId ? 'ON' : 'OFF'} in this file.`);
 }
 
-export async function setLibraryStyleSuggestions(result: SuggestionResults, query?: string, toggle = false) {
+export async function setLibrarySuggestions(result: SuggestionResults, query?: string, toggle = false) {
 	result.setLoadingMessage('Loading available Styles');
-	let allLibraryStyles = await figma.clientStorage.keysAsync();
+	let allLibraries = await figma.clientStorage.keysAsync();
 
-	const libraryStyles = allLibraryStyles.map((libraryStyleId) => ({
-		name: libraryStyleId,
-		// data: libraryStyleId,
-		icon: toggle ? svgIconCheckbox(isInLocalStylesList(libraryStyleId)) : undefined,
+	const libraries = allLibraries.map((libraryId) => ({
+		name: libraryId,
+		// data: libraryId,
+		icon: toggle ? svgIconCheckbox(isLibraryActive(libraryId)) : undefined,
 	}));
 
-	console.log({ allLibraryStyles, libraryStyles });
-	result.setSuggestions(searchSuggestions(query, libraryStyles));
+	console.log({ allLibraries, libraries });
+	result.setSuggestions(searchSuggestions(query, libraries));
 }
 
-export async function deleteStyles(libraryStyleId: string) {
-	figma.notify(`Deleting Library Style '${libraryStyleId}'...`);
-	await figma.clientStorage.deleteAsync(libraryStyleId);
-	removeFromLocalStylesList(libraryStyleId);
-	figma.notify(`Deleted Library Style '${libraryStyleId}'`);
+export async function removeLibrary(libraryId: string) {
+	figma.notify(`Deleting Library Style '${libraryId}'...`);
+	await figma.clientStorage.deleteAsync(libraryId);
+	removeLibraryId(libraryId);
+	figma.notify(`Deleted Library Style '${libraryId}'`);
 }
 
 export async function getLibraryStyles(libraryStyleId: string, type: StyleClientStorageType) {
 	const styleClientStorage = (await figma.clientStorage.getAsync(libraryStyleId)) as StyleClientStorage;
-
 	const styleType = styleClientStorage[type];
+	
 	const styles: BaseStyle[] = [];
 	for (let i = 0; i < styleType.length; i++) {
-		const styleKey = styleType[i];
+		const styleKey = styleType[i][0];
 		const style = await figma.importStyleByKeyAsync(styleKey);
 		console.log({ style, i, t: styleType.length });
 		styles.push(style);
-		if (i > 50) break;
+		if (i > 50) break; // too slow, gets slower...
 	}
 	return styles;
 }
-export async function getLocalLibraryStyles(type: StyleClientStorageType) {
-	const localStylesList = getLocalStylesList();
-	console.log({ localStylesList });
-
+export async function getAllActiveLibraryStyles(type: StyleClientStorageType) {
+	const localStylesList = getActiveLibraryIds();
 	const styles: BaseStyle[] = [];
 	for (let i = 0; i < localStylesList.length; i++) {
 		const libraryStyleId = localStylesList[i];
 		const style = await getLibraryStyles(libraryStyleId, type);
-		// console.log({ style });
-
 		styles.push(...style);
 	}
 	return styles;
 }
-export const getLibraryPaintStyles = async () => getLocalLibraryStyles('paint') as Promise<PaintStyle[]>;
-export const getLibraryGridStyles = async () => getLocalLibraryStyles('grid') as Promise<GridStyle[]>;
-export const getLibraryEffectStyles = async () => getLocalLibraryStyles('effect') as Promise<EffectStyle[]>;
-export const getLibraryTextStyles = async () => getLocalLibraryStyles('text') as Promise<TextStyle[]>;
+export const getLibraryPaintStyles = async () => getAllActiveLibraryStyles('paint') as Promise<PaintStyle[]>;
+export const getLibraryGridStyles = async () => getAllActiveLibraryStyles('grid') as Promise<GridStyle[]>;
+export const getLibraryEffectStyles = async () => getAllActiveLibraryStyles('effect') as Promise<EffectStyle[]>;
+export const getLibraryTextStyles = async () => getAllActiveLibraryStyles('text') as Promise<TextStyle[]>;
+
 ////////
 
-export const localStylesListKey = 'thing';
+export const activeLibrariesKey = 'thing'; // will need to reset storage to change this
 
-export const getLocalStylesList = (): string[] => {
-	const localStylesList = figma.root.getPluginData(localStylesListKey);
-	return localStylesList ? JSON.parse(localStylesList) : [];
+export const getActiveLibraryIds = (): string[] => {
+	const activeLibraries = figma.root.getPluginData(activeLibrariesKey);
+	return activeLibraries ? JSON.parse(activeLibraries) : [];
 };
 
-export const setLocalStylesList = (localStylesList: string[]) =>
-	figma.root.setPluginData(localStylesListKey, JSON.stringify(localStylesList));
+export const setActiveLibraryIds = (libraryIds: string[]) =>
+	figma.root.setPluginData(activeLibrariesKey, JSON.stringify(libraryIds));
 
-export const toggleLocalStylesList = (libraryStyleId: string) => {
+export const toggleActiveLibraryId = (libraryId: string) => {
 	// use a set to prevent duplication
-	const localStylesList = new Set(getLocalStylesList());
-	if (localStylesList.has(libraryStyleId)) {
-		localStylesList.delete(libraryStyleId);
+	const activeLibraryIds = new Set(getActiveLibraryIds());
+	if (activeLibraryIds.has(libraryId)) {
+		activeLibraryIds.delete(libraryId);
 	} else {
-		localStylesList.add(libraryStyleId);
+		activeLibraryIds.add(libraryId);
 	}
-	setLocalStylesList(Array.from(localStylesList.values()));
-	return localStylesList.has(libraryStyleId);
+	setActiveLibraryIds(Array.from(activeLibraryIds.values()));
+	return activeLibraryIds.has(libraryId);
 };
 
-export const isInLocalStylesList = (libraryStyleId: string) => {
-	const localStylesList = new Set(getLocalStylesList());
-	return localStylesList.has(libraryStyleId);
+export const isLibraryActive = (libraryId: string) => {
+	const activeLibraryIds = new Set(getActiveLibraryIds());
+	return activeLibraryIds.has(libraryId);
 };
-export const mapStyleKey = (style: BaseStyle) => style.key;
 
-export const addToLocalStylesList = (libraryStyleId: string) => {
+export const addLibraryId = (libraryId: string) => {
 	// use a set to prevent duplication
-	const localStylesList = new Set(getLocalStylesList());
-	localStylesList.add(libraryStyleId);
-	setLocalStylesList(Array.from(localStylesList.values()));
+	const activeLibraryIds = new Set(getActiveLibraryIds());
+	activeLibraryIds.add(libraryId);
+	setActiveLibraryIds(Array.from(activeLibraryIds.values()));
 };
-export const removeFromLocalStylesList = (libraryStyleId: string) => {
+export const removeLibraryId = (libraryId: string) => {
 	// use a set to prevent duplication
-	const localStylesList = new Set(getLocalStylesList());
-	localStylesList.delete(libraryStyleId);
-	setLocalStylesList(Array.from(localStylesList.values()));
+	const activeLibraryIds = new Set(getActiveLibraryIds());
+	activeLibraryIds.delete(libraryId);
+	setActiveLibraryIds(Array.from(activeLibraryIds.values()));
 };

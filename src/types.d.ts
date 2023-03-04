@@ -5,13 +5,14 @@ interface SuggestionObj<Data = any> {
 	iconUrl?: string;
 }
 
+type StorageStyle = [BaseStyle['key'], BaseStyle['name']];
 interface StyleClientStorage {
-	paint: string[];
-	text: string[];
-	effect: string[];
-	grid: string[];
+	paint: StorageStyle[];
+	text: StorageStyle[];
+	effect: StorageStyle[];
+	grid: StorageStyle[];
 	saved: number;
 }
-type StyleClientStorageType = keyof Omit<StyleClientStorage, 'saved'>
+type StyleClientStorageType = keyof Omit<StyleClientStorage, 'saved'>;
 
 type Suggestion<Data = any> = SuggestionObj<Data> | string;

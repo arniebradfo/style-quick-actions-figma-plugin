@@ -1,4 +1,4 @@
-import { getLibraryPaintStyles, setLibraryStyleSuggestions } from './manageStyles';
+import { getLibraryPaintStyles, setLibrarySuggestions } from './manageStyles';
 import { svgIconEffect, svgIconGrid, svgIconText } from './svgIcon';
 import { svgIconPaint } from './svgIconPaint';
 import { searchSuggestions, Command, Key } from './utils';
@@ -23,12 +23,12 @@ export const onInput = async ({ parameters, key: _key, query, result }: Paramete
 			setGridSuggestions(result, query);
 			break;
 		case Command.ToggleStyle:
-			await setLibraryStyleSuggestions(result, query, true);
+			await setLibrarySuggestions(result, query, true);
 			break;
 		case Command.PublishStyle:
 			break;
 		case Command.DeleteStyle:
-			await setLibraryStyleSuggestions(result, query);
+			await setLibrarySuggestions(result, query);
 			break;
 		default:
 			break;
