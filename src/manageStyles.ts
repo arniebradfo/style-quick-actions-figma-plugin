@@ -1,14 +1,33 @@
+import {
+	StorageEffectStyle,
+	StorageGridStyle,
+	StoragePaintStyle,
+	StorageTextStyle,
+	mapPaintStyleToStorage,
+	mapGridStyleToStorage,
+	mapEffectStyleToStorage,
+	mapTextStyleToStorage,
+} from './mapStyle';
 import { svgIconCheckbox } from './svgIcon';
 import { searchSuggestions } from './utils';
 
-const mapStyleToClientStorage = (style: BaseStyle) => [style.key, style.name] as StorageStyle;
+export interface StyleClientStorage {
+	paint: StoragePaintStyle[];
+	text: StorageTextStyle[];
+	effect: StorageEffectStyle[];
+	grid: StorageGridStyle[];
+	saved: number;
+}
+
+export type StyleClientStorageType = keyof Omit<StyleClientStorage, 'saved'>;
 
 export async function publishLibraryStyles() {
 	const styles: StyleClientStorage = {
-		paint: figma.getLocalPaintStyles().map(mapStyleToClientStorage),
-		text: figma.getLocalTextStyles().map(mapStyleToClientStorage),
-		effect: figma.getLocalEffectStyles().map(mapStyleToClientStorage),
-		grid: figma.getLocalGridStyles().map(mapStyleToClientStorage),
+		//@ts-ignore
+		paint: figma.getLocalPaintStyles().map(mapPaintStyleToStorage),
+		text: figma.getLocalTextStyles().map(mapTextStyleToStorage),
+		effect: figma.getLocalEffectStyles().map(mapEffectStyleToStorage),
+		grid: figma.getLocalGridStyles().map(mapGridStyleToStorage),
 		saved: Date.now(),
 	};
 
@@ -54,7 +73,7 @@ export async function removeLibrary(libraryId: string) {
 export async function getLibraryStyles(libraryStyleId: string, type: StyleClientStorageType) {
 	const styleClientStorage = (await figma.clientStorage.getAsync(libraryStyleId)) as StyleClientStorage;
 	const styleType = styleClientStorage[type];
-	
+
 	const styles: BaseStyle[] = [];
 	for (let i = 0; i < styleType.length; i++) {
 		const styleKey = styleType[i][0];

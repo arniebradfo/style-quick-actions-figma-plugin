@@ -1,16 +1,12 @@
 import * as fuzzy from 'fuzzy';
 
-export enum Command {
-	Fill = 'fill',
-	Stroke = 'stroke',
-	Text = 'text',
-	Effect = 'effect',
-	Grid = 'grid',
-	ToggleStyle = 'toggle',
-	PublishStyle = 'publish',
-	DeleteStyle = 'delete',
-}
-export type Key = Command;
+export interface SuggestionObj<Data = any> {
+	name: string;
+	data?: Data;
+	icon?: string | Uint8Array;
+	iconUrl?: string;
+} 
+export type Suggestion<Data = any> = SuggestionObj<Data> | string;
 
 const extract = (suggestion: Suggestion) => {
 	return typeof suggestion === 'string' ? suggestion : suggestion.name;

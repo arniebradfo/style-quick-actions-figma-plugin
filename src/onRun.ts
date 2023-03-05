@@ -1,5 +1,5 @@
-import { Command } from './utils';
 import { removeLibrary, publishLibraryStyles, toggleLibrary } from './manageStyles';
+import { InputCommand } from './types';
 
 export const onRun = async (event: RunEvent) => {
 	const { selection } = figma.currentPage;
@@ -14,38 +14,38 @@ export const onRun = async (event: RunEvent) => {
 	});
 
 	switch (command) {
-		case Command.Fill:
+		case InputCommand.Fill:
 			selection.forEach((node) => {
 				if ('fillStyleId' in node) node.fillStyleId = styleId;
 			});
 			break;
-		case Command.Stroke:
+		case InputCommand.Stroke:
 			selection.forEach((node) => {
 				if ('strokeStyleId' in node) node.strokeStyleId = styleId;
 			});
 			break;
-		case Command.Text:
+		case InputCommand.Text:
 			selection.forEach((node) => {
 				if ('textStyleId' in node) node.textStyleId = styleId;
 			});
 			break;
-		case Command.Effect:
+		case InputCommand.Effect:
 			selection.forEach((node) => {
 				if ('effectStyleId' in node) node.effectStyleId = styleId;
 			});
 			break;
-		case Command.Grid:
+		case InputCommand.Grid:
 			selection.forEach((node) => {
 				if ('gridStyleId' in node) node.gridStyleId = styleId;
 			});
 			break;
-		case Command.ToggleStyle:
+		case InputCommand.ToggleStyle:
 			await toggleLibrary(styleId);
 			break;
-		case Command.PublishStyle:
+		case InputCommand.PublishStyle:
 			await publishLibraryStyles();
 			break;
-		case Command.DeleteStyle:
+		case InputCommand.DeleteStyle:
 			await removeLibrary(styleId);
 			break;
 		default:
@@ -57,6 +57,6 @@ export const onRun = async (event: RunEvent) => {
 };
 
 type _RunEvent = {
-	command: Command;
-	parameters: Record<Command, string>;
+	command: InputCommand;
+	parameters: Record<InputCommand, string>;
 };

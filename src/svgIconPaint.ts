@@ -1,3 +1,5 @@
+import { rgbPaintToCss, rgbPaintToCssSolid } from './mapStyle';
+
 export const svgIconPaint = (style: PaintStyle) => {
 	const paintChipsSvg: string[] = style.paints.map((paint, i) => {
 		if (paint.type === 'SOLID') {
@@ -30,17 +32,11 @@ export const svgIconPaint = (style: PaintStyle) => {
 		style.paints.length === 1 &&
 		style.paints[0].type === 'SOLID' &&
 		style.paints[0].opacity != null &&
-        style.paints[0].opacity < 1;
-    
+		style.paints[0].opacity < 1;
+
 	// stack paint chips
 	return paintPreviewSvg(paintChipsSvg, { outline, checkerBoxes });
 };
-
-const rgbPaintToCss = (rgb: RGB | RGBA) => {
-	const { r, g, b, a = 1 } = rgb as RGBA;
-	return `rgb(${r * 255},${g * 255},${b * 255},${a})`;
-};
-const rgbPaintToCssSolid = (rgb: RGB | RGBA) => rgbPaintToCss({ ...rgb, a: undefined });
 
 const paintPreviewSvg = (fillSvg: string[], options: { outline?: boolean; checkerBoxes?: boolean } = {}) => /*svg*/ `
 	<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">

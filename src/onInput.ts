@@ -1,33 +1,34 @@
 import { getLibraryPaintStyles, setLibrarySuggestions } from './manageStyles';
 import { svgIconEffect, svgIconGrid, svgIconText } from './svgIcon';
 import { svgIconPaint } from './svgIconPaint';
-import { searchSuggestions, Command, Key } from './utils';
+import { InputCommand, InputKey } from './types';
+import { searchSuggestions } from './utils';
 
 export const onInput = async ({ parameters, key: _key, query, result }: ParameterInputEvent) => {
-	const key = _key as Key;
+	const key = _key as InputKey;
 	console.log({ parameters, key, query, result });
 	switch (key) {
-		case Command.Fill:
+		case InputCommand.Fill:
 			await setPaintSuggestions(result, query);
 			break;
-		case Command.Stroke:
+		case InputCommand.Stroke:
 			await setPaintSuggestions(result, query);
 			break;
-		case Command.Text:
+		case InputCommand.Text:
 			setTextSuggestions(result, query);
 			break;
-		case Command.Effect:
+		case InputCommand.Effect:
 			setEffectSuggestions(result, query);
 			break;
-		case Command.Grid:
+		case InputCommand.Grid:
 			setGridSuggestions(result, query);
 			break;
-		case Command.ToggleStyle:
+		case InputCommand.ToggleStyle:
 			await setLibrarySuggestions(result, query, true);
 			break;
-		case Command.PublishStyle:
+		case InputCommand.PublishStyle:
 			break;
-		case Command.DeleteStyle:
+		case InputCommand.DeleteStyle:
 			await setLibrarySuggestions(result, query);
 			break;
 		default:
