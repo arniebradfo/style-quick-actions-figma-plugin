@@ -1,4 +1,5 @@
 import { getLibraryPaintStyles, setLibrarySuggestions } from './manageStyles';
+import { mapPaintStyleToStorage } from './mapStyle';
 import { svgIconEffect, svgIconGrid, svgIconText } from './svgIcon';
 import { svgIconPaint } from './svgIconPaint';
 import { InputCommand, InputKey } from './types';
@@ -7,6 +8,7 @@ import { searchSuggestions } from './utils';
 export const onInput = async ({ parameters, key: _key, query, result }: ParameterInputEvent) => {
 	const key = _key as InputKey;
 	console.log({ parameters, key, query, result });
+	result.setLoadingMessage('Loading Options')
 	switch (key) {
 		case InputCommand.Fill:
 			await setPaintSuggestions(result, query);
@@ -37,15 +39,14 @@ export const onInput = async ({ parameters, key: _key, query, result }: Paramete
 };
 
 async function setPaintSuggestions(result: SuggestionResults, query?: string) {
-	const localPaintStyles = figma.getLocalPaintStyles();
+	const localPaintStyles = figma.getLocalPaintStyles().map(mapPaintStyleToStorage);
 	const remotePaintStyles = await getLibraryPaintStyles()
 	const paintStyleSuggestions = localPaintStyles
 		.concat(remotePaintStyles)
 		.map((style) => ({
-			name: style.name,
-			data: style.id,
+			data: style[0],
+			name: style[1],
 			icon: svgIconPaint(style),
-			// style: ''
 		}));
 	result.setSuggestions(searchSuggestions(query, paintStyleSuggestions));
 }

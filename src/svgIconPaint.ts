@@ -1,25 +1,29 @@
-import { rgbPaintToCss, rgbPaintToCssSolid } from './mapStyle';
+import {
+	GradientStop,
+	PaintStyleType,
+	StoragePaintStyle,
+	
+} from './mapStyle';
 
-export const svgIconPaint = (style: PaintStyle) => {
-	const paintChipsSvg: string[] = style.paints.map((paint, i) => {
-		if (paint.type === 'SOLID') {
-			const cssColor = rgbPaintToCssSolid(paint.color);
-			return solidFillSvg(i, cssColor, paint.opacity); // color
-		} else if (paint.type === 'IMAGE') {
-			return imageFillIconSvg(i, undefined, paint.opacity); // color
-		} else if (paint.type === 'VIDEO') {
-			return videoFillIconSvg(i, undefined, paint.opacity); // color
+export const svgIconPaint = (style: StoragePaintStyle) => {
+	const paints = style[3]
+	const paintChipsSvg: string[] = paints.map((paint, i) => {
+		const [type, fill, opacity] = paint;
+		if (type === PaintStyleType.SOLID) {
+			return solidFillSvg(i, fill, opacity); // color
+		} else if (type === PaintStyleType.IMAGE) {
+			return imageFillIconSvg(i, undefined, opacity); // color
+		} else if (type === PaintStyleType.VIDEO) {
+			return videoFillIconSvg(i, undefined, opacity); // color
 		} else {
-			// (paint.type === 'GRADIENT_SOMETHING')
-			const colorStops = paint.gradientStops.map(
-				(gradientStop) =>
-					({ color: rgbPaintToCss(gradientStop.color), offset: gradientStop.position } as SvgColorStop)
-			);
-			if (paint.type === 'GRADIENT_RADIAL' || paint.type === 'GRADIENT_DIAMOND') {
-				return radialGradientFillSvg(i, colorStops, paint.opacity);
+			// (type === PaintStyleType.GRADIENT_SOMETHING)
+			const gradientStops = fill as GradientStop[];
+			const colorStops = gradientStops.map(([color, offset, opacity]) => ({ color, offset } as SvgColorStop));
+			if (type === PaintStyleType.GRADIENT_RADIAL || type === PaintStyleType.GRADIENT_DIAMOND) {
+				return radialGradientFillSvg(i, colorStops, opacity);
 			} else {
-				// (paint.type === 'GRADIENT_LINEAR' || paint.type === 'GRADIENT_ANGULAR')
-				return linearGradientFillSvg(i, colorStops, paint.opacity);
+				// (type === PaintStyleType.GRADIENT_LINEAR || type === PaintStyleType.GRADIENT_ANGULAR)
+				return linearGradientFillSvg(i, colorStops, opacity);
 			}
 		}
 	});
@@ -28,11 +32,12 @@ export const svgIconPaint = (style: PaintStyle) => {
 	// const outline = sumOpacity < 0.2;
 	const outline = true; // to be sure
 
+	const [firstType, firstFill, firstOpacity] = paints[0]
 	const checkerBoxes =
-		style.paints.length === 1 &&
-		style.paints[0].type === 'SOLID' &&
-		style.paints[0].opacity != null &&
-		style.paints[0].opacity < 1;
+		paints.length === 1 &&
+		firstType === PaintStyleType.SOLID &&
+		firstOpacity != null &&
+		firstOpacity < 1;
 
 	// stack paint chips
 	return paintPreviewSvg(paintChipsSvg, { outline, checkerBoxes });

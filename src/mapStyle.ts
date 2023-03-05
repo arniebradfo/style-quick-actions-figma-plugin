@@ -25,9 +25,9 @@ export function mapPaintStyleToStorage(style: PaintStyle): StoragePaintStyle {
 			return [paintStyleType, '', paint.opacity] as StoragePaintSolidSubStyle;
 		} else {
 			const colorStops = paint.gradientStops.map(
-				(gradientStop) => [rgbPaintToCss(gradientStop.color), gradientStop.position] as ColorStop
+				(gradientStop) => [rgbPaintToCss(gradientStop.color), gradientStop.position] as GradientStop
 			);
-			return [paintStyleType, colorStops] as StoragePaintGradientSubStyle;
+			return [paintStyleType, colorStops, paint.opacity] as StoragePaintGradientSubStyle;
 		}
 	});
 	return [style.id, style.name, StyleType.PAINT, paintChips];
@@ -121,11 +121,11 @@ const effectStyleTypeMap = {
 type CssColor = string;
 type Offset = number;
 type Opacity = number;
-type ColorStop = [CssColor, Offset, Opacity?];
+export type GradientStop = [CssColor, Offset, Opacity?];
 
 export type StoragePaintSolidSubStyle = [PaintSolidStyleType, CssColor, Opacity];
 
-export type StoragePaintGradientSubStyle = [PaintGradientStyleType, ColorStop[]];
+export type StoragePaintGradientSubStyle = [PaintGradientStyleType, GradientStop[], Opacity];
 
 export type StoragePaintSubStyle = StoragePaintSolidSubStyle | StoragePaintGradientSubStyle;
 
@@ -134,3 +134,9 @@ export type StoragePaintStyle = [...StorageBaseStyle, StyleType.PAINT, StoragePa
 export type StorageEffectStyle = [...StorageBaseStyle, StyleType.EFFECT, EffectStyleType];
 export type StorageGridStyle = [...StorageBaseStyle, StyleType.GRID, GridStyleType];
 export type StorageTextStyle = [...StorageBaseStyle, StyleType.TEXT];
+export type StorageStyle =
+	| StorageBaseStyle
+	| StoragePaintStyle
+	| StorageEffectStyle
+	| StorageGridStyle
+	| StorageTextStyle;

@@ -7,6 +7,7 @@ import {
 	mapGridStyleToStorage,
 	mapEffectStyleToStorage,
 	mapTextStyleToStorage,
+	StorageStyle,
 } from './mapStyle';
 import { svgIconCheckbox } from './svgIcon';
 import { searchSuggestions } from './utils';
@@ -72,32 +73,22 @@ export async function removeLibrary(libraryId: string) {
 
 export async function getLibraryStyles(libraryStyleId: string, type: StyleClientStorageType) {
 	const styleClientStorage = (await figma.clientStorage.getAsync(libraryStyleId)) as StyleClientStorage;
-	const styleType = styleClientStorage[type];
-
-	const styles: BaseStyle[] = [];
-	for (let i = 0; i < styleType.length; i++) {
-		const styleKey = styleType[i][0];
-		const style = await figma.importStyleByKeyAsync(styleKey);
-		console.log({ style, i, t: styleType.length });
-		styles.push(style);
-		if (i > 50) break; // too slow, gets slower...
-	}
-	return styles;
+	return styleClientStorage[type];
 }
 export async function getAllActiveLibraryStyles(type: StyleClientStorageType) {
-	const localStylesList = getActiveLibraryIds();
-	const styles: BaseStyle[] = [];
-	for (let i = 0; i < localStylesList.length; i++) {
-		const libraryStyleId = localStylesList[i];
-		const style = await getLibraryStyles(libraryStyleId, type);
+	const activeLibraryIds = getActiveLibraryIds();
+	const styles: StorageStyle[] = [];
+	for (let i = 0; i < activeLibraryIds.length; i++) {
+		const activeLibrary = activeLibraryIds[i];
+		const style = await getLibraryStyles(activeLibrary, type);
 		styles.push(...style);
 	}
 	return styles;
 }
-export const getLibraryPaintStyles = async () => getAllActiveLibraryStyles('paint') as Promise<PaintStyle[]>;
-export const getLibraryGridStyles = async () => getAllActiveLibraryStyles('grid') as Promise<GridStyle[]>;
-export const getLibraryEffectStyles = async () => getAllActiveLibraryStyles('effect') as Promise<EffectStyle[]>;
-export const getLibraryTextStyles = async () => getAllActiveLibraryStyles('text') as Promise<TextStyle[]>;
+export const getLibraryPaintStyles = async () => getAllActiveLibraryStyles('paint') as Promise<StoragePaintStyle[]>;
+export const getLibraryGridStyles = async () => getAllActiveLibraryStyles('grid') as Promise<StorageGridStyle[]>;
+export const getLibraryEffectStyles = async () => getAllActiveLibraryStyles('effect') as Promise<StorageEffectStyle[]>;
+export const getLibraryTextStyles = async () => getAllActiveLibraryStyles('text') as Promise<StorageTextStyle[]>;
 
 ////////
 
