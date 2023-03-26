@@ -2,7 +2,7 @@ import { getLibraryPaintStyles, setLibrarySuggestions } from './manageStyles';
 import { mapPaintStyleToStorage, StoragePaintStyle } from './mapStyle';
 import { svgIconEffect, svgIconGrid, svgIconText } from './svgIcon';
 import { svgIconPaint } from './svgIconPaint';
-import { InputCommand, InputKey } from './types';
+import { InputCommand, InputKey, StyleSuggestion, SuggestionData } from './types';
 import { searchSuggestions, Suggestion } from './utils';
 
 export const onInput = async ({ parameters, key: _key, query, result }: ParameterInputEvent) => {
@@ -38,17 +38,30 @@ export const onInput = async ({ parameters, key: _key, query, result }: Paramete
 	}
 };
 
-let allPaintStyleSuggestions: Suggestion[] | null = null;
+let allPaintStyleSuggestions: StyleSuggestion[] | null = null;
 async function setPaintSuggestions(result: SuggestionResults, query?: string) {
 	if (allPaintStyleSuggestions == null) {
 		// memoize allPaintStyleSuggestions
 		const localPaintStyles = figma.getLocalPaintStyles().map(mapPaintStyleToStorage);
 		const remotePaintStyles = await getLibraryPaintStyles();
-		allPaintStyleSuggestions = localPaintStyles.concat(remotePaintStyles).map((style) => ({
-			data: style[0],
+
+		// TODO: clean up this repeat code
+		allPaintStyleSuggestions = localPaintStyles.map((style) => ({
+			data: {
+				source: 'local',
+				id: style[0],
+			},
 			name: style[1],
 			icon: svgIconPaint(style),
 		}));
+		allPaintStyleSuggestions = allPaintStyleSuggestions.concat(remotePaintStyles.map((style) => ({
+			data: {
+				source: 'remote',
+				id: style[0],
+			},
+			name: style[1],
+			icon: svgIconPaint(style),
+		})));
 	}
 	result.setSuggestions(searchSuggestions(query, allPaintStyleSuggestions));
 }

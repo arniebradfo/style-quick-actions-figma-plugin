@@ -2,19 +2,6 @@
 // https://www.figma.com/plugin-docs/api/figma-clientStorage/#:~:text=Each%20plugin%20gets%20a%20total%20of%201MB%20of%20storage
 // We are saving only what we need for the suggestion: id, name, and svg icon data
 
-/* export function mapStyleToStorage(style: BaseStyle) {
-	switch (style.type) {
-		case 'PAINT':
-			return mapPaintStyleToStorage(style as PaintStyle);
-		case 'GRID':
-			return mapGridStyleToStorage(style as GridStyle);
-		case 'EFFECT':
-			return mapEffectStyleToStorage(style as EffectStyle);
-		case 'TEXT':
-			return mapTextStyleToStorage(style as TextStyle);
-	}
-} */
-
 export function mapPaintStyleToStorage(style: PaintStyle): StoragePaintStyle {
 	const paintChips = style.paints.map((paint, i) => {
 		const paintStyleType = paintStyleTypeMap[paint.type];
@@ -30,25 +17,25 @@ export function mapPaintStyleToStorage(style: PaintStyle): StoragePaintStyle {
 			return [paintStyleType, colorStops, paint.opacity] as StoragePaintGradientSubStyle;
 		}
 	});
-	return [style.id, style.name, StyleType.PAINT, paintChips];
+	return [style.key, style.name, StyleType.PAINT, paintChips];
 }
 
 export function mapGridStyleToStorage(style: GridStyle): StorageGridStyle {
 	// Figma seems to pick the icon of the last grid pattern type in the stack
 	// which is the first in the array
 	const { pattern } = style.layoutGrids[0];
-	return [style.id, style.name, StyleType.GRID, gridStyleTypeMap[pattern]];
+	return [style.key, style.name, StyleType.GRID, gridStyleTypeMap[pattern]];
 }
 
 export function mapEffectStyleToStorage(style: EffectStyle): StorageEffectStyle {
 	// Figma seems to pick the icon of the last effect type in the stack
 	// which is the first in the array
 	const { type } = style.effects[0];
-	return [style.id, style.name, StyleType.EFFECT, effectStyleTypeMap[type]];
+	return [style.key, style.name, StyleType.EFFECT, effectStyleTypeMap[type]];
 }
 
 export function mapTextStyleToStorage(style: TextStyle): StorageTextStyle {
-	return [style.id, style.name, StyleType.TEXT];
+	return [style.key, style.name, StyleType.TEXT];
 }
 
 export const rgbPaintToCss = (rgb: RGB | RGBA): CssColor => {
@@ -129,7 +116,7 @@ export type StoragePaintGradientSubStyle = [PaintGradientStyleType, GradientStop
 
 export type StoragePaintSubStyle = StoragePaintSolidSubStyle | StoragePaintGradientSubStyle;
 
-export type StorageBaseStyle = [BaseStyle['id'], BaseStyle['name']];
+export type StorageBaseStyle = [BaseStyle['key'], BaseStyle['name']];
 export type StoragePaintStyle = [...StorageBaseStyle, StyleType.PAINT, StoragePaintSubStyle[]];
 export type StorageEffectStyle = [...StorageBaseStyle, StyleType.EFFECT, EffectStyleType];
 export type StorageGridStyle = [...StorageBaseStyle, StyleType.GRID, GridStyleType];

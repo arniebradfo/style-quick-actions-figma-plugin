@@ -1,8 +1,8 @@
 import * as fuzzy from 'fuzzy';
 
-export interface SuggestionObj<Data = any> {
+export interface SuggestionObj<DataT = any> {
 	name: string;
-	data?: Data;
+	data?: DataT;
 	icon?: string | Uint8Array;
 	iconUrl?: string;
 } 
