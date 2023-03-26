@@ -40,7 +40,7 @@ export async function publishLibraryStyles() {
 	await figma.clientStorage.setAsync(fileName, styles);
 
 	figma.notify(
-		`${isUpdating ? 'Updating ' : ''}Published Library Style as '${fileName}'. Now available in 'Toggle Styles'.`
+		`${isUpdating ? 'Updating ' : ''}Published Library Style as '${fileName}'. Now available in 'Toggle Library Styles'.`
 	);
 }
 

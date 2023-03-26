@@ -30,20 +30,17 @@ Quick actions for applying styles
   - ? what happens to unpublished files ?
 
 ## TODO:
-- create a Map of style names to key
-- get local styles with `getLocal{Type}Styles()`
-- get team library styles by?
-  - calling `importStyleByKeyAsync()`
-- get team library ids by
-  - parsing all nodes in the document async, and collecting a map of ids?
-  - providing command to
-    - parse document and collect all currently used styles (slow)
-      - `setPluginData` local to the file
-    - save/update styles from the current document for use in other documents
-      - in `figma.clientStorage`
-    - delete saved styles
-      - from `figma.clientStorage`
-    - use/remove a saved library per file
-      - 
-
-path:
+- BUG: local styles don't apply
+- add to style names
+  - local or remote
+    - remote is the library name
+  - text size and line height "• 12/Auto"
+- hide/disable library from toggle 
+  - maybe its just always toggled on
+- storage size
+  - test the size limits of storage
+  - notify user if size is too large
+  - save size as part of the storage meta
+  - display size 
+- what if there are no libraries to toggle or delete?
+- what if two libraries have the same name?
