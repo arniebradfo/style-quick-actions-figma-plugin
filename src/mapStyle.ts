@@ -2,6 +2,16 @@
 // https://www.figma.com/plugin-docs/api/figma-clientStorage/#:~:text=Each%20plugin%20gets%20a%20total%20of%201MB%20of%20storage
 // We are saving only what we need for the suggestion: id, name, and svg icon data
 
+export function mapPaintStyleToStorageLocal<TStyle extends BaseStyle, TStorage extends StorageTypeStyle>(
+	mapStyleToStorage: (style: TStyle) => TStorage
+): (style: TStyle) => StorageStyleLocal<TStorage> {
+	return (style: TStyle) => {
+		const storageStyleLocal = mapStyleToStorage(style);
+		storageStyleLocal[0] = style.id;
+		return [...storageStyleLocal, 'local' as 'local'];
+	};
+}
+
 export function mapPaintStyleToStorage(style: PaintStyle): StoragePaintStyle {
 	const paintChips = style.paints.map((paint, i) => {
 		const paintStyleType = paintStyleTypeMap[paint.type];
@@ -116,14 +126,11 @@ export type StoragePaintGradientSubStyle = [PaintGradientStyleType, GradientStop
 
 export type StoragePaintSubStyle = StoragePaintSolidSubStyle | StoragePaintGradientSubStyle;
 
-export type StorageBaseStyle = [BaseStyle['key'], BaseStyle['name']];
+export type StorageBaseStyle = [BaseStyle['key'] | BaseStyle['id'], BaseStyle['name']];
 export type StoragePaintStyle = [...StorageBaseStyle, StyleType.PAINT, StoragePaintSubStyle[]];
 export type StorageEffectStyle = [...StorageBaseStyle, StyleType.EFFECT, EffectStyleType];
 export type StorageGridStyle = [...StorageBaseStyle, StyleType.GRID, GridStyleType];
-export type StorageTextStyle = [...StorageBaseStyle, StyleType.TEXT];
-export type StorageStyle =
-	| StorageBaseStyle
-	| StoragePaintStyle
-	| StorageEffectStyle
-	| StorageGridStyle
-	| StorageTextStyle;
+export type StorageTextStyle = [...StorageBaseStyle, StyleType.TEXT, never?];
+export type StorageTypeStyle = StoragePaintStyle | StorageEffectStyle | StorageGridStyle | StorageTextStyle;
+export type StorageStyleLocal<T extends StorageTypeStyle = StorageTypeStyle> = [...T, 'local'];
+export type StorageStyle = StorageBaseStyle | StorageTypeStyle | StorageStyleLocal;

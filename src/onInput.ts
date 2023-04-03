@@ -1,5 +1,5 @@
 import { getLibraryPaintStyles, setLibrarySuggestions } from './manageStyles';
-import { mapPaintStyleToStorage, StoragePaintStyle } from './mapStyle';
+import { mapPaintStyleToStorage, mapPaintStyleToStorageLocal, StoragePaintStyle } from './mapStyle';
 import { svgIconEffect, svgIconGrid, svgIconText } from './svgIcon';
 import { svgIconPaint } from './svgIconPaint';
 import { InputCommand, InputKey, StyleSuggestion, SuggestionData } from './types';
@@ -41,27 +41,18 @@ export const onInput = async ({ parameters, key: _key, query, result }: Paramete
 let allPaintStyleSuggestions: StyleSuggestion[] | null = null;
 async function setPaintSuggestions(result: SuggestionResults, query?: string) {
 	if (allPaintStyleSuggestions == null) {
-		// memoize allPaintStyleSuggestions
-		const localPaintStyles = figma.getLocalPaintStyles().map(mapPaintStyleToStorage);
+		const localPaintStyles = figma.getLocalPaintStyles().map(mapPaintStyleToStorageLocal(mapPaintStyleToStorage));
 		const remotePaintStyles = await getLibraryPaintStyles();
 
-		// TODO: clean up this repeat code
-		allPaintStyleSuggestions = localPaintStyles.map((style) => ({
+		// memoize allPaintStyleSuggestions
+		allPaintStyleSuggestions = [...localPaintStyles, ...remotePaintStyles].map((style) => ({
 			data: {
-				source: 'local',
+				source: style[4] ? 'local' : 'remote',
 				id: style[0],
 			},
 			name: style[1],
 			icon: svgIconPaint(style),
 		}));
-		allPaintStyleSuggestions = allPaintStyleSuggestions.concat(remotePaintStyles.map((style) => ({
-			data: {
-				source: 'remote',
-				id: style[0],
-			},
-			name: style[1],
-			icon: svgIconPaint(style),
-		})));
 	}
 	result.setSuggestions(searchSuggestions(query, allPaintStyleSuggestions));
 }
@@ -91,4 +82,12 @@ function setEffectSuggestions(result: SuggestionResults, query?: string) {
 		icon: svgIconEffect(style),
 	}));
 	result.setSuggestions(searchSuggestions(query, effectStyles));
+}
+function mapStyleToStorageLocal(
+	style: PaintStyle,
+	mapPaintStyleToStorage: (
+		style: PaintStyle
+	) => [string, string, import('./mapStyle').StyleType.PAINT, import('./mapStyle').StoragePaintSubStyle[]]
+): any {
+	throw new Error('Function not implemented.');
 }

@@ -1,12 +1,7 @@
-import {
-	GradientStop,
-	PaintStyleType,
-	StoragePaintStyle,
-	
-} from './mapStyle';
+import { GradientStop, PaintStyleType, StoragePaintStyle, StorageStyleLocal } from './mapStyle';
 
-export const svgIconPaint = (style: StoragePaintStyle) => {
-	const paints = style[3]
+export const svgIconPaint = (style: StorageStyleLocal<StoragePaintStyle> | StoragePaintStyle) => {
+	const paints = style[3];
 	const paintChipsSvg: string[] = paints.map((paint, i) => {
 		const [type, fill, opacity] = paint;
 		if (type === PaintStyleType.SOLID) {
@@ -32,12 +27,9 @@ export const svgIconPaint = (style: StoragePaintStyle) => {
 	// const outline = sumOpacity < 0.2;
 	const outline = true; // to be sure
 
-	const [firstType, firstFill, firstOpacity] = paints[0]
+	const [firstType, firstFill, firstOpacity] = paints[0];
 	const checkerBoxes =
-		paints.length === 1 &&
-		firstType === PaintStyleType.SOLID &&
-		firstOpacity != null &&
-		firstOpacity < 1;
+		paints.length === 1 && firstType === PaintStyleType.SOLID && firstOpacity != null && firstOpacity < 1;
 
 	// stack paint chips
 	return paintPreviewSvg(paintChipsSvg, { outline, checkerBoxes });
