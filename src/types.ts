@@ -11,10 +11,3 @@ export enum InputCommand {
 	DeleteStyle = 'delete',
 }
 export type InputKey = InputCommand;
-
-export type SuggestionData = {
-	source: 'local' | 'remote';
-	id: string;
-};
-
-export type StyleSuggestion = SuggestionObj<SuggestionData>;

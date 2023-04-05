@@ -14,8 +14,8 @@ import {
 } from './mapStyle';
 import { svgIconEffect, svgIconGrid, svgIconText } from './svgIcon';
 import { svgIconPaint } from './svgIconPaint';
-import { InputCommand, InputKey, StyleSuggestion, SuggestionData } from './types';
-import { searchSuggestions, Suggestion } from './utils';
+import { InputCommand, InputKey } from './types';
+import { mapDisplayName, searchSuggestions, StyleSuggestion, Suggestion } from './utils';
 
 export const onInput = async ({ parameters, key: _key, query, result }: ParameterInputEvent) => {
 	const key = _key as InputKey;
@@ -60,26 +60,30 @@ async function setPaintSuggestions(result: SuggestionResults, query?: string) {
 			data: {
 				source: style[4] ? 'local' : 'remote',
 				id: style[0],
+				displayName: `${style[1]} · ${style[4] ? '[local]' : ''}`,
 			},
 			name: style[1],
 			icon: svgIconPaint(style),
 		}));
 	}
-	result.setSuggestions(searchSuggestions(query, allPaintStyleSuggestions));
+	result.setSuggestions(searchSuggestions(query, allPaintStyleSuggestions, mapDisplayName));
 }
 
 let allTextStyleSuggestions: StyleSuggestion[] | null = null;
 async function setTextSuggestions(result: SuggestionResults, query?: string) {
+	// if (!allTextStyleSuggestions) { // Memoize
 	const localStyles = figma.getLocalTextStyles().map(mapStyleToStorageLocal(mapTextStyleToStorage));
 	const remoteStyles = await getLibraryTextStyles();
 	allTextStyleSuggestions = [...localStyles, ...remoteStyles].map((style) => ({
 		data: {
 			source: style[4] ? 'local' : 'remote',
 			id: style[0],
+			displayName: `${style[1]} · ${style[4] ? '[local]' : ''}`,
 		},
-		name: style[1], // 00/Auto
+		name: style[1],
 		icon: svgIconText(style),
 	}));
+	// }
 	result.setSuggestions(searchSuggestions(query, allTextStyleSuggestions));
 }
 
@@ -91,6 +95,7 @@ async function setGridSuggestions(result: SuggestionResults, query?: string) {
 		data: {
 			source: style[4] ? 'local' : 'remote',
 			id: style[0],
+			displayName: `${style[1]} · ${style[4] ? '[local]' : ''}`,
 		},
 		name: style[1],
 		icon: svgIconGrid(style),
@@ -106,6 +111,7 @@ async function setEffectSuggestions(result: SuggestionResults, query?: string) {
 		data: {
 			source: style[4] ? 'local' : 'remote',
 			id: style[0],
+			displayName: `${style[1]} · ${style[4] ? '[local]' : ''}`,
 		},
 		name: style[1],
 		icon: svgIconEffect(style),
