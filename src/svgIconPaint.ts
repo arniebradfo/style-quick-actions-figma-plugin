@@ -1,6 +1,6 @@
-import { GradientStop, PaintStyleType, StoragePaintStyle, StorageStyleLocal } from './mapStyle';
+import { GradientStop, PaintStyleType, StoragePaintStyle } from './mapStyle';
 
-export const svgIconPaint = (style: StorageStyleLocal<StoragePaintStyle>) => {
+export const svgIconPaint = (style: StoragePaintStyle) => {
 	const paints = style[3];
 	const paintChipsSvg: string[] = paints.map((paint, i) => {
 		const [type, fill, opacity] = paint;

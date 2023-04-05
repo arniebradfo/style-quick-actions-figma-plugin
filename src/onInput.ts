@@ -60,7 +60,7 @@ async function setPaintSuggestions(result: SuggestionResults, query?: string) {
 			data: {
 				source: style[4] ? 'local' : 'remote',
 				id: style[0],
-				displayName: `${style[1]} · ${style[4] ? '[local]' : ''}`,
+				displayName: `${style[1]} · ${style[4] === true ? '[local]' : style[4] ?? ''}`,
 			},
 			name: style[1],
 			icon: svgIconPaint(style),
@@ -76,15 +76,15 @@ async function setTextSuggestions(result: SuggestionResults, query?: string) {
 		const remoteStyles = await getLibraryTextStyles();
 		allTextStyleSuggestions = [...localStyles, ...remoteStyles].map((style) => ({
 			data: {
-				source: style[4] ? 'local' : 'remote',
+				source: style[4] === true ? 'local' : 'remote',
 				id: style[0],
-				displayName: `${style[1]} · ${style[4] ? '[local]' : ''}`,
+				displayName: `${style[1]} · ${style[4] === true ? '[local]' : style[4] ?? ''}`,
 			},
 			name: style[1],
 			icon: svgIconText(style),
 		}));
 	}
-	result.setSuggestions(searchSuggestions(query, allTextStyleSuggestions));
+	result.setSuggestions(searchSuggestions(query, allTextStyleSuggestions, mapDisplayName));
 }
 
 let allGridStyleSuggestions: StyleSuggestion[] | null = null;
@@ -94,15 +94,15 @@ async function setGridSuggestions(result: SuggestionResults, query?: string) {
 		const remoteStyles = await getLibraryGridStyles();
 		allGridStyleSuggestions = [...localStyles, ...remoteStyles].map((style) => ({
 			data: {
-				source: style[4] ? 'local' : 'remote',
+				source: style[4] === true ? 'local' : 'remote',
 				id: style[0],
-				displayName: `${style[1]} · ${style[4] ? '[local]' : ''}`,
+				displayName: `${style[1]} · ${style[4] === true ? '[local]' : style[4] ?? ''}`,
 			},
 			name: style[1],
 			icon: svgIconGrid(style),
 		}));
 	}
-	result.setSuggestions(searchSuggestions(query, allGridStyleSuggestions));
+	result.setSuggestions(searchSuggestions(query, allGridStyleSuggestions, mapDisplayName));
 }
 
 let allEffectStyleSuggestions: StyleSuggestion[] | null = null;
@@ -112,13 +112,13 @@ async function setEffectSuggestions(result: SuggestionResults, query?: string) {
 		const remoteStyles = await getLibraryEffectStyles();
 		allEffectStyleSuggestions = [...localStyles, ...remoteStyles].map((style) => ({
 			data: {
-				source: style[4] ? 'local' : 'remote',
+				source: style[4] === true ? 'local' : 'remote',
 				id: style[0],
-				displayName: `${style[1]} · ${style[4] ? '[local]' : ''}`,
+				displayName: `${style[1]} · ${style[4] === true ? '[local]' : style[4] ?? ''}`,
 			},
 			name: style[1],
 			icon: svgIconEffect(style),
 		}));
 	}
-	result.setSuggestions(searchSuggestions(query, allEffectStyleSuggestions));
+	result.setSuggestions(searchSuggestions(query, allEffectStyleSuggestions, mapDisplayName));
 }

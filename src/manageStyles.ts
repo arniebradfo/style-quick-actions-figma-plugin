@@ -73,17 +73,20 @@ export async function removeLibrary(libraryId: string) {
 
 export async function getLibraryStyles(libraryStyleId: string, type: StyleClientStorageType) {
 	const styleClientStorage = (await figma.clientStorage.getAsync(libraryStyleId)) as StyleClientStorage;
-	return styleClientStorage[type];
+	return styleClientStorage[type].map(style => {
+		style[4] = libraryStyleId;
+		return style
+	});
 }
 export async function getAllActiveLibraryStyles(type: StyleClientStorageType) {
 	const activeLibraryIds = getActiveLibraryIds();
-	const styles: StorageStyle[] = [];
+	const allStyles: StorageStyle[] = [];
 	for (let i = 0; i < activeLibraryIds.length; i++) {
 		const activeLibrary = activeLibraryIds[i];
-		const style = await getLibraryStyles(activeLibrary, type);
-		styles.push(...style);
+		const styles = await getLibraryStyles(activeLibrary, type);
+		allStyles.push(...styles);
 	}
-	return styles;
+	return allStyles;
 }
 export const getLibraryPaintStyles = async () => getAllActiveLibraryStyles('paint') as Promise<StoragePaintStyle[]>;
 export const getLibraryGridStyles = async () => getAllActiveLibraryStyles('grid') as Promise<StorageGridStyle[]>;

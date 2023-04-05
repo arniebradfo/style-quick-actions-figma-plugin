@@ -3,15 +3,14 @@ import {
 	GridStyleType,
 	StorageEffectStyle,
 	StorageGridStyle,
-	StorageStyleLocal,
 	StorageTextStyle,
 } from './mapStyle';
 
-export const svgIconText = (storageStyle: StorageStyleLocal<StorageTextStyle>) => {
+export const svgIconText = (storageStyle: StorageTextStyle) => {
 	// TODO search font name for 'bold' 'italic' 'allcaps' and use a different icon...
 	return svgIcon(paths.text);
 };
-export const svgIconGrid = (storageStyle: StorageStyleLocal<StorageGridStyle>) => {
+export const svgIconGrid = (storageStyle: StorageGridStyle) => {
 	switch (storageStyle[3]) {
 		case GridStyleType.GRID:
 			return svgIcon(paths.grid);
@@ -21,7 +20,7 @@ export const svgIconGrid = (storageStyle: StorageStyleLocal<StorageGridStyle>) =
 			return svgIcon(paths.columns);
 	}
 };
-export const svgIconEffect = (storageStyle: StorageStyleLocal<StorageEffectStyle>) => {
+export const svgIconEffect = (storageStyle: StorageEffectStyle) => {
 	switch (storageStyle[3]) {
 		case EffectStyleType.DROP_SHADOW:
 			return svgIcon(paths.dropShadow);

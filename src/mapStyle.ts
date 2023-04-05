@@ -4,11 +4,12 @@
 
 export function mapStyleToStorageLocal<TStyle extends BaseStyle, TStorage extends StorageTypeStyle>(
 	mapStyleToStorage: (style: TStyle) => TStorage
-): (style: TStyle) => StorageStyleLocal<TStorage> {
+): (style: TStyle) => TStorage {
 	return (style: TStyle) => {
-		const storageStyleLocal = mapStyleToStorage(style);
+		const storageStyleLocal = mapStyleToStorage(style) 
 		storageStyleLocal[0] = style.id;
-		return [...storageStyleLocal, 'local' as 'local'];
+		storageStyleLocal[4] = true
+		return storageStyleLocal
 	};
 }
 
@@ -126,11 +127,13 @@ export type StoragePaintGradientSubStyle = [PaintGradientStyleType, GradientStop
 
 export type StoragePaintSubStyle = StoragePaintSolidSubStyle | StoragePaintGradientSubStyle;
 
+/** true means 'local', otherwise, the string is the Library name */
+export type StorageSource = true | string
+
 export type StorageBaseStyle = [BaseStyle['key'] | BaseStyle['id'], BaseStyle['name']];
-export type StoragePaintStyle = [...StorageBaseStyle, StyleType.PAINT, StoragePaintSubStyle[]];
-export type StorageEffectStyle = [...StorageBaseStyle, StyleType.EFFECT, EffectStyleType];
-export type StorageGridStyle = [...StorageBaseStyle, StyleType.GRID, GridStyleType];
-export type StorageTextStyle = [...StorageBaseStyle, StyleType.TEXT, never?];
+export type StoragePaintStyle = [...StorageBaseStyle, StyleType.PAINT, StoragePaintSubStyle[], StorageSource?];
+export type StorageEffectStyle = [...StorageBaseStyle, StyleType.EFFECT, EffectStyleType, StorageSource?];
+export type StorageGridStyle = [...StorageBaseStyle, StyleType.GRID, GridStyleType, StorageSource?];
+export type StorageTextStyle = [...StorageBaseStyle, StyleType.TEXT, never?, StorageSource?];
 export type StorageTypeStyle = StoragePaintStyle | StorageEffectStyle | StorageGridStyle | StorageTextStyle;
-export type StorageStyleLocal<T extends StorageTypeStyle = StorageTypeStyle> = [...T, 'local'?];
-export type StorageStyle = StorageBaseStyle | StorageTypeStyle | StorageStyleLocal;
+export type StorageStyle = StorageBaseStyle | StorageTypeStyle ;
