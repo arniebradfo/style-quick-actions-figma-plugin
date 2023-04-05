@@ -6,6 +6,7 @@ import {
 	setLibrarySuggestions,
 } from './manageStyles';
 import {
+	StorageTypeStyle,
 	mapEffectStyleToStorage,
 	mapGridStyleToStorage,
 	mapPaintStyleToStorage,
@@ -51,74 +52,60 @@ export const onInput = async ({ parameters, key: _key, query, result }: Paramete
 	}
 };
 
-let allPaintStyleSuggestions: StyleSuggestion[] | null = null;
-async function setPaintSuggestions(result: SuggestionResults, query?: string) {
-	if (allPaintStyleSuggestions == null) {
-		const localStyles = figma.getLocalPaintStyles().map(mapStyleToStorageLocal(mapPaintStyleToStorage));
-		const remoteStyles = await getLibraryPaintStyles();
-		allPaintStyleSuggestions = [...localStyles, ...remoteStyles].map((style) => ({
-			data: {
-				source: style[4] ? 'local' : 'remote',
-				id: style[0],
-				displayName: `${style[1]} · ${style[4] === true ? '[local]' : style[4] ?? ''}`,
-			},
-			name: style[1],
-			icon: svgIconPaint(style),
-		}));
-	}
-	result.setSuggestions(searchSuggestions(query, allPaintStyleSuggestions, mapDisplayName));
+function setStyleSuggestions<BaseStyleT extends BaseStyle, StorageTypeStyleT extends StorageTypeStyle>({
+	getLocalStyles,
+	mapStyleToStorage,
+	getLibraryStyles,
+	svgIconFn,
+}: {
+	getLocalStyles: () => BaseStyleT[];
+	mapStyleToStorage: (style: BaseStyleT) => StorageTypeStyleT;
+	getLibraryStyles: () => Promise<StorageTypeStyleT[]>;
+	svgIconFn: (style: StorageTypeStyleT) => string;
+}) {
+	let allStyleSuggestionsMemo: StyleSuggestion[] | null = null;
+	return async (result: SuggestionResults, query?: string) => {
+		if (allStyleSuggestionsMemo == null) {
+			const localStyles = getLocalStyles().map(mapStyleToStorageLocal(mapStyleToStorage));
+			const remoteStyles = await getLibraryStyles();
+			allStyleSuggestionsMemo = [...localStyles, ...remoteStyles].map((style) => ({
+				data: {
+					source: style[4] === true ? 'local' : 'remote',
+					id: style[0],
+					displayName: `${style[1]} · ${style[4] === true ? '[local]' : style[4] ?? ''}`,
+				},
+				name: style[1],
+				icon: svgIconFn(style),
+			}));
+		}
+		result.setSuggestions(searchSuggestions(query, allStyleSuggestionsMemo, mapDisplayName));
+	};
 }
 
-let allTextStyleSuggestions: StyleSuggestion[] | null = null;
-async function setTextSuggestions(result: SuggestionResults, query?: string) {
-	if (allTextStyleSuggestions == null) {
-		const localStyles = figma.getLocalTextStyles().map(mapStyleToStorageLocal(mapTextStyleToStorage));
-		const remoteStyles = await getLibraryTextStyles();
-		allTextStyleSuggestions = [...localStyles, ...remoteStyles].map((style) => ({
-			data: {
-				source: style[4] === true ? 'local' : 'remote',
-				id: style[0],
-				displayName: `${style[1]} · ${style[4] === true ? '[local]' : style[4] ?? ''}`,
-			},
-			name: style[1],
-			icon: svgIconText(style),
-		}));
-	}
-	result.setSuggestions(searchSuggestions(query, allTextStyleSuggestions, mapDisplayName));
-}
+const setPaintSuggestions = setStyleSuggestions({
+	getLocalStyles: figma.getLocalPaintStyles,
+	mapStyleToStorage: mapPaintStyleToStorage,
+	getLibraryStyles: getLibraryPaintStyles,
+	svgIconFn: svgIconPaint,
+});
 
-let allGridStyleSuggestions: StyleSuggestion[] | null = null;
-async function setGridSuggestions(result: SuggestionResults, query?: string) {
-	if (allGridStyleSuggestions == null) {
-		const localStyles = figma.getLocalGridStyles().map(mapStyleToStorageLocal(mapGridStyleToStorage));
-		const remoteStyles = await getLibraryGridStyles();
-		allGridStyleSuggestions = [...localStyles, ...remoteStyles].map((style) => ({
-			data: {
-				source: style[4] === true ? 'local' : 'remote',
-				id: style[0],
-				displayName: `${style[1]} · ${style[4] === true ? '[local]' : style[4] ?? ''}`,
-			},
-			name: style[1],
-			icon: svgIconGrid(style),
-		}));
-	}
-	result.setSuggestions(searchSuggestions(query, allGridStyleSuggestions, mapDisplayName));
-}
+const setTextSuggestions = setStyleSuggestions({
+	getLocalStyles: figma.getLocalTextStyles,
+	mapStyleToStorage: mapTextStyleToStorage,
+	getLibraryStyles: getLibraryTextStyles,
+	svgIconFn: svgIconText,
+});
 
-let allEffectStyleSuggestions: StyleSuggestion[] | null = null;
-async function setEffectSuggestions(result: SuggestionResults, query?: string) {
-	if (allEffectStyleSuggestions == null) {
-		const localStyles = figma.getLocalEffectStyles().map(mapStyleToStorageLocal(mapEffectStyleToStorage));
-		const remoteStyles = await getLibraryEffectStyles();
-		allEffectStyleSuggestions = [...localStyles, ...remoteStyles].map((style) => ({
-			data: {
-				source: style[4] === true ? 'local' : 'remote',
-				id: style[0],
-				displayName: `${style[1]} · ${style[4] === true ? '[local]' : style[4] ?? ''}`,
-			},
-			name: style[1],
-			icon: svgIconEffect(style),
-		}));
-	}
-	result.setSuggestions(searchSuggestions(query, allEffectStyleSuggestions, mapDisplayName));
-}
+const setGridSuggestions = setStyleSuggestions({
+	getLocalStyles: figma.getLocalGridStyles,
+	mapStyleToStorage: mapGridStyleToStorage,
+	getLibraryStyles: getLibraryGridStyles,
+	svgIconFn: svgIconGrid,
+});
+
+const setEffectSuggestions = setStyleSuggestions({
+	getLocalStyles: figma.getLocalEffectStyles,
+	mapStyleToStorage: mapEffectStyleToStorage,
+	getLibraryStyles: getLibraryEffectStyles,
+	svgIconFn: svgIconEffect,
+});
