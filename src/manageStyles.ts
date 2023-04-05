@@ -10,7 +10,7 @@ import {
 	StorageStyle,
 } from './mapStyle';
 import { svgIconCheckbox } from './svgIcon';
-import { searchSuggestions } from './utils';
+import { searchSuggestions } from './suggestion';
 
 export interface StyleClientStorage {
 	paint: StoragePaintStyle[];

@@ -15,7 +15,7 @@ import {
 import { svgIconEffect, svgIconGrid, svgIconText } from './svgIcon';
 import { svgIconPaint } from './svgIconPaint';
 import { InputCommand, InputKey } from './types';
-import { mapDisplayName, searchSuggestions, StyleSuggestion, Suggestion } from './utils';
+import { mapDisplayName, searchSuggestions, StyleSuggestion, Suggestion } from './suggestion';
 
 export const onInput = async ({ parameters, key: _key, query, result }: ParameterInputEvent) => {
 	const key = _key as InputKey;

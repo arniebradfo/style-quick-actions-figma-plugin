@@ -1,5 +1,6 @@
 import { removeLibrary, publishLibraryStyles, toggleLibrary } from './manageStyles';
-import { InputCommand, SuggestionData } from './types';
+import { SuggestionData } from './suggestion';
+import { InputCommand } from './types';
 
 export const onRun = async (event: RunEvent) => {
 	const { selection } = figma.currentPage;

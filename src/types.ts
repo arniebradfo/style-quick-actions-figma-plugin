@@ -1,5 +1,3 @@
-import { SuggestionObj } from './utils';
-
 export enum InputCommand {
 	Fill = 'fill',
 	Stroke = 'stroke',
