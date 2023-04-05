@@ -30,7 +30,8 @@ Quick actions for applying styles
   - ? what happens to unpublished files ?
 
 ## TODO:
-- BUG: local styles don't apply
+- BUG: applying unpublished styles needs a fallback
+- 'nothing selected' warning
 - add to style names
   - local or remote
     - remote is the library name

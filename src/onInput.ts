@@ -1,5 +1,17 @@
-import { getLibraryPaintStyles, setLibrarySuggestions } from './manageStyles';
-import { mapPaintStyleToStorage, mapPaintStyleToStorageLocal, StoragePaintStyle } from './mapStyle';
+import {
+	getLibraryEffectStyles,
+	getLibraryGridStyles,
+	getLibraryPaintStyles,
+	getLibraryTextStyles,
+	setLibrarySuggestions,
+} from './manageStyles';
+import {
+	mapEffectStyleToStorage,
+	mapGridStyleToStorage,
+	mapPaintStyleToStorage,
+	mapStyleToStorageLocal,
+	mapTextStyleToStorage,
+} from './mapStyle';
 import { svgIconEffect, svgIconGrid, svgIconText } from './svgIcon';
 import { svgIconPaint } from './svgIconPaint';
 import { InputCommand, InputKey, StyleSuggestion, SuggestionData } from './types';
@@ -8,7 +20,7 @@ import { searchSuggestions, Suggestion } from './utils';
 export const onInput = async ({ parameters, key: _key, query, result }: ParameterInputEvent) => {
 	const key = _key as InputKey;
 	console.log({ parameters, key, query, result });
-	result.setLoadingMessage('Loading Options'); // doesn't run
+	result.setLoadingMessage('Loading Options'); // doesn't appear
 	switch (key) {
 		case InputCommand.Fill:
 			await setPaintSuggestions(result, query);
@@ -17,18 +29,19 @@ export const onInput = async ({ parameters, key: _key, query, result }: Paramete
 			await setPaintSuggestions(result, query);
 			break;
 		case InputCommand.Text:
-			setTextSuggestions(result, query);
+			await setTextSuggestions(result, query);
 			break;
 		case InputCommand.Effect:
-			setEffectSuggestions(result, query);
+			await setEffectSuggestions(result, query);
 			break;
 		case InputCommand.Grid:
-			setGridSuggestions(result, query);
+			await setGridSuggestions(result, query);
 			break;
 		case InputCommand.ToggleStyle:
 			await setLibrarySuggestions(result, query, true);
 			break;
 		case InputCommand.PublishStyle:
+			// no input
 			break;
 		case InputCommand.DeleteStyle:
 			await setLibrarySuggestions(result, query);
@@ -41,11 +54,9 @@ export const onInput = async ({ parameters, key: _key, query, result }: Paramete
 let allPaintStyleSuggestions: StyleSuggestion[] | null = null;
 async function setPaintSuggestions(result: SuggestionResults, query?: string) {
 	if (allPaintStyleSuggestions == null) {
-		const localPaintStyles = figma.getLocalPaintStyles().map(mapPaintStyleToStorageLocal(mapPaintStyleToStorage));
-		const remotePaintStyles = await getLibraryPaintStyles();
-
-		// memoize allPaintStyleSuggestions
-		allPaintStyleSuggestions = [...localPaintStyles, ...remotePaintStyles].map((style) => ({
+		const localStyles = figma.getLocalPaintStyles().map(mapStyleToStorageLocal(mapPaintStyleToStorage));
+		const remoteStyles = await getLibraryPaintStyles();
+		allPaintStyleSuggestions = [...localStyles, ...remoteStyles].map((style) => ({
 			data: {
 				source: style[4] ? 'local' : 'remote',
 				id: style[0],
@@ -57,37 +68,47 @@ async function setPaintSuggestions(result: SuggestionResults, query?: string) {
 	result.setSuggestions(searchSuggestions(query, allPaintStyleSuggestions));
 }
 
-function setTextSuggestions(result: SuggestionResults, query?: string) {
-	const textStyles = figma.getLocalTextStyles().map((style) => ({
-		name: style.name, // 00/Auto
-		data: style.id,
+let allTextStyleSuggestions: StyleSuggestion[] | null = null;
+async function setTextSuggestions(result: SuggestionResults, query?: string) {
+	const localStyles = figma.getLocalTextStyles().map(mapStyleToStorageLocal(mapTextStyleToStorage));
+	const remoteStyles = await getLibraryTextStyles();
+	allTextStyleSuggestions = [...localStyles, ...remoteStyles].map((style) => ({
+		data: {
+			source: style[4] ? 'local' : 'remote',
+			id: style[0],
+		},
+		name: style[1], // 00/Auto
 		icon: svgIconText(style),
 	}));
-	result.setSuggestions(searchSuggestions(query, textStyles));
+	result.setSuggestions(searchSuggestions(query, allTextStyleSuggestions));
 }
 
-function setGridSuggestions(result: SuggestionResults, query?: string) {
-	const gridStyles = figma.getLocalGridStyles().map((style) => ({
-		name: style.name,
-		data: style.id,
+let allGridStyleSuggestions: StyleSuggestion[] | null = null;
+async function setGridSuggestions(result: SuggestionResults, query?: string) {
+	const localStyles = figma.getLocalGridStyles().map(mapStyleToStorageLocal(mapGridStyleToStorage));
+	const remoteStyles = await getLibraryGridStyles();
+	allGridStyleSuggestions = [...localStyles, ...remoteStyles].map((style) => ({
+		data: {
+			source: style[4] ? 'local' : 'remote',
+			id: style[0],
+		},
+		name: style[1],
 		icon: svgIconGrid(style),
 	}));
-	result.setSuggestions(searchSuggestions(query, gridStyles));
+	result.setSuggestions(searchSuggestions(query, allGridStyleSuggestions));
 }
 
-function setEffectSuggestions(result: SuggestionResults, query?: string) {
-	const effectStyles = figma.getLocalEffectStyles().map((style) => ({
-		name: style.name,
-		data: style.id,
+let allEffectStyleSuggestions: StyleSuggestion[] | null = null;
+async function setEffectSuggestions(result: SuggestionResults, query?: string) {
+	const localStyles = figma.getLocalEffectStyles().map(mapStyleToStorageLocal(mapEffectStyleToStorage));
+	const remoteStyles = await getLibraryEffectStyles();
+	allEffectStyleSuggestions = [...localStyles, ...remoteStyles].map((style) => ({
+		data: {
+			source: style[4] ? 'local' : 'remote',
+			id: style[0],
+		},
+		name: style[1],
 		icon: svgIconEffect(style),
 	}));
-	result.setSuggestions(searchSuggestions(query, effectStyles));
-}
-function mapStyleToStorageLocal(
-	style: PaintStyle,
-	mapPaintStyleToStorage: (
-		style: PaintStyle
-	) => [string, string, import('./mapStyle').StyleType.PAINT, import('./mapStyle').StoragePaintSubStyle[]]
-): any {
-	throw new Error('Function not implemented.');
+	result.setSuggestions(searchSuggestions(query, allEffectStyleSuggestions));
 }

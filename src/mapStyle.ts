@@ -2,7 +2,7 @@
 // https://www.figma.com/plugin-docs/api/figma-clientStorage/#:~:text=Each%20plugin%20gets%20a%20total%20of%201MB%20of%20storage
 // We are saving only what we need for the suggestion: id, name, and svg icon data
 
-export function mapPaintStyleToStorageLocal<TStyle extends BaseStyle, TStorage extends StorageTypeStyle>(
+export function mapStyleToStorageLocal<TStyle extends BaseStyle, TStorage extends StorageTypeStyle>(
 	mapStyleToStorage: (style: TStyle) => TStorage
 ): (style: TStyle) => StorageStyleLocal<TStorage> {
 	return (style: TStyle) => {
@@ -132,5 +132,5 @@ export type StorageEffectStyle = [...StorageBaseStyle, StyleType.EFFECT, EffectS
 export type StorageGridStyle = [...StorageBaseStyle, StyleType.GRID, GridStyleType];
 export type StorageTextStyle = [...StorageBaseStyle, StyleType.TEXT, never?];
 export type StorageTypeStyle = StoragePaintStyle | StorageEffectStyle | StorageGridStyle | StorageTextStyle;
-export type StorageStyleLocal<T extends StorageTypeStyle = StorageTypeStyle> = [...T, 'local'];
+export type StorageStyleLocal<T extends StorageTypeStyle = StorageTypeStyle> = [...T, 'local'?];
 export type StorageStyle = StorageBaseStyle | StorageTypeStyle | StorageStyleLocal;

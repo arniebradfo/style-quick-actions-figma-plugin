@@ -1,32 +1,35 @@
-export const svgIconText = (style: TextStyle) => {
+import {
+	EffectStyleType,
+	GridStyleType,
+	StorageEffectStyle,
+	StorageGridStyle,
+	StorageStyleLocal,
+	StorageTextStyle,
+} from './mapStyle';
+
+export const svgIconText = (storageStyle: StorageStyleLocal<StorageTextStyle>) => {
 	// TODO search font name for 'bold' 'italic' 'allcaps' and use a different icon...
 	return svgIcon(paths.text);
 };
-export const svgIconGrid = (style: GridStyle) => {
-	// Figma seems to pick the icon of the last grid pattern type in the stack
-	// which is the first in the array
-	const { pattern } = style.layoutGrids[0];
-	switch (pattern) {
-		case 'GRID':
+export const svgIconGrid = (storageStyle: StorageStyleLocal<StorageGridStyle>) => {
+	switch (storageStyle[3]) {
+		case GridStyleType.GRID:
 			return svgIcon(paths.grid);
-		case 'ROWS':
+		case GridStyleType.ROWS:
 			return svgIcon(paths.rows);
-		case 'COLUMNS':
+		case GridStyleType.COLUMNS:
 			return svgIcon(paths.columns);
 	}
 };
-export const svgIconEffect = (style: EffectStyle) => {
-	// Figma seems to pick the icon of the last effect type in the stack
-	// which is the first in the array
-	const { type } = style.effects[0];
-	switch (type) {
-		case 'DROP_SHADOW':
+export const svgIconEffect = (storageStyle: StorageStyleLocal<StorageEffectStyle>) => {
+	switch (storageStyle[3]) {
+		case EffectStyleType.DROP_SHADOW:
 			return svgIcon(paths.dropShadow);
-		case 'INNER_SHADOW':
+		case EffectStyleType.INNER_SHADOW:
 			return svgIcon(paths.innerShadow);
-		case 'LAYER_BLUR':
+		case EffectStyleType.LAYER_BLUR:
 			return svgIcon(paths.layerBlur);
-		case 'BACKGROUND_BLUR':
+		case EffectStyleType.BACKGROUND_BLUR:
 			return svgIcon(paths.backgroundBlur);
 	}
 };
