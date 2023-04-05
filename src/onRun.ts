@@ -25,6 +25,13 @@ export const onRun = async (event: RunEvent) => {
 				break;
 		}
 	} else {
+
+		if (selection.length === 0) {
+			figma.notify('No Layers Selected');
+			figma.closePlugin();
+			return;
+		}
+
 		const { id: styleIdOrKey, source } = parameterData as SuggestionData;
 		const style =
 			source === 'remote' ? await figma.importStyleByKeyAsync(styleIdOrKey) : figma.getStyleById(styleIdOrKey);
