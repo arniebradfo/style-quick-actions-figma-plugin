@@ -15,7 +15,7 @@ import {
 import { svgIconEffect, svgIconGrid, svgIconText } from './svgIcon';
 import { svgIconPaint } from './svgIconPaint';
 import { InputCommand, InputKey } from './types';
-import { mapDisplayName, searchSuggestions, StyleSuggestion, Suggestion } from './suggestion';
+import { mapDisplayName, searchSuggestions, StyleSuggestion } from './suggestion';
 
 export const onInput = async ({ parameters, key: _key, query, result }: ParameterInputEvent) => {
 	const key = _key as InputKey;
@@ -71,50 +71,54 @@ async function setPaintSuggestions(result: SuggestionResults, query?: string) {
 
 let allTextStyleSuggestions: StyleSuggestion[] | null = null;
 async function setTextSuggestions(result: SuggestionResults, query?: string) {
-	// if (!allTextStyleSuggestions) { // Memoize
-	const localStyles = figma.getLocalTextStyles().map(mapStyleToStorageLocal(mapTextStyleToStorage));
-	const remoteStyles = await getLibraryTextStyles();
-	allTextStyleSuggestions = [...localStyles, ...remoteStyles].map((style) => ({
-		data: {
-			source: style[4] ? 'local' : 'remote',
-			id: style[0],
-			displayName: `${style[1]} · ${style[4] ? '[local]' : ''}`,
-		},
-		name: style[1],
-		icon: svgIconText(style),
-	}));
-	// }
+	if (allTextStyleSuggestions == null) {
+		const localStyles = figma.getLocalTextStyles().map(mapStyleToStorageLocal(mapTextStyleToStorage));
+		const remoteStyles = await getLibraryTextStyles();
+		allTextStyleSuggestions = [...localStyles, ...remoteStyles].map((style) => ({
+			data: {
+				source: style[4] ? 'local' : 'remote',
+				id: style[0],
+				displayName: `${style[1]} · ${style[4] ? '[local]' : ''}`,
+			},
+			name: style[1],
+			icon: svgIconText(style),
+		}));
+	}
 	result.setSuggestions(searchSuggestions(query, allTextStyleSuggestions));
 }
 
 let allGridStyleSuggestions: StyleSuggestion[] | null = null;
 async function setGridSuggestions(result: SuggestionResults, query?: string) {
-	const localStyles = figma.getLocalGridStyles().map(mapStyleToStorageLocal(mapGridStyleToStorage));
-	const remoteStyles = await getLibraryGridStyles();
-	allGridStyleSuggestions = [...localStyles, ...remoteStyles].map((style) => ({
-		data: {
-			source: style[4] ? 'local' : 'remote',
-			id: style[0],
-			displayName: `${style[1]} · ${style[4] ? '[local]' : ''}`,
-		},
-		name: style[1],
-		icon: svgIconGrid(style),
-	}));
+	if (allGridStyleSuggestions == null) {
+		const localStyles = figma.getLocalGridStyles().map(mapStyleToStorageLocal(mapGridStyleToStorage));
+		const remoteStyles = await getLibraryGridStyles();
+		allGridStyleSuggestions = [...localStyles, ...remoteStyles].map((style) => ({
+			data: {
+				source: style[4] ? 'local' : 'remote',
+				id: style[0],
+				displayName: `${style[1]} · ${style[4] ? '[local]' : ''}`,
+			},
+			name: style[1],
+			icon: svgIconGrid(style),
+		}));
+	}
 	result.setSuggestions(searchSuggestions(query, allGridStyleSuggestions));
 }
 
 let allEffectStyleSuggestions: StyleSuggestion[] | null = null;
 async function setEffectSuggestions(result: SuggestionResults, query?: string) {
-	const localStyles = figma.getLocalEffectStyles().map(mapStyleToStorageLocal(mapEffectStyleToStorage));
-	const remoteStyles = await getLibraryEffectStyles();
-	allEffectStyleSuggestions = [...localStyles, ...remoteStyles].map((style) => ({
-		data: {
-			source: style[4] ? 'local' : 'remote',
-			id: style[0],
-			displayName: `${style[1]} · ${style[4] ? '[local]' : ''}`,
-		},
-		name: style[1],
-		icon: svgIconEffect(style),
-	}));
+	if (allEffectStyleSuggestions == null) {
+		const localStyles = figma.getLocalEffectStyles().map(mapStyleToStorageLocal(mapEffectStyleToStorage));
+		const remoteStyles = await getLibraryEffectStyles();
+		allEffectStyleSuggestions = [...localStyles, ...remoteStyles].map((style) => ({
+			data: {
+				source: style[4] ? 'local' : 'remote',
+				id: style[0],
+				displayName: `${style[1]} · ${style[4] ? '[local]' : ''}`,
+			},
+			name: style[1],
+			icon: svgIconEffect(style),
+		}));
+	}
 	result.setSuggestions(searchSuggestions(query, allEffectStyleSuggestions));
 }
