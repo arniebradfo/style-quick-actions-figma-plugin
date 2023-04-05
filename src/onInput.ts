@@ -78,6 +78,10 @@ function setStyleSuggestions<BaseStyleT extends BaseStyle, StorageTypeStyleT ext
 				icon: svgIconFn(style),
 			}));
 		}
+		if (allStyleSuggestionsMemo.length === 0) {
+			result.setLoadingMessage('No styles available in this file')
+			return;
+		}
 		result.setSuggestions(searchSuggestions(query, allStyleSuggestionsMemo, mapDisplayName));
 	};
 }
