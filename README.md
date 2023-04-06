@@ -30,14 +30,13 @@ Quick actions for applying styles
   - ? what happens to unpublished files ?
 
 ## TODO:
-- BUG: applying unpublished styles needs a fallback
-- 'nothing selected' warning
+- other color functions: maybe '=' char then...
+  - hex by typing '#' then number
+  - change hsl by typing '+' 'a10'
 - add to style names
-  - local or remote
-    - remote is the library name
   - text size and line height "• 12/Auto"
-- hide/disable library from toggle 
-  - maybe its just always toggled on
+- hide/disable local library from toggle 
+  - maybe its just always toggled on?
 - storage size
   - test the size limits of storage
   - notify user if size is too large

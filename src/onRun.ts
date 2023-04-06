@@ -25,7 +25,6 @@ export const onRun = async (event: RunEvent) => {
 				break;
 		}
 	} else {
-
 		if (selection.length === 0) {
 			figma.notify('No Layers Selected');
 			figma.closePlugin();
@@ -33,8 +32,19 @@ export const onRun = async (event: RunEvent) => {
 		}
 
 		const { id: styleIdOrKey, source } = parameterData as SuggestionData;
-		const style =
-			source === 'remote' ? await figma.importStyleByKeyAsync(styleIdOrKey) : figma.getStyleById(styleIdOrKey);
+
+		let style: BaseStyle | null = null;
+		try {
+			style =
+				source === 'remote'
+					? await figma.importStyleByKeyAsync(styleIdOrKey)
+					: figma.getStyleById(styleIdOrKey);
+		} catch (error) {
+			console.error(`Style not available`, { command, id: styleIdOrKey, source, error });
+			figma.notify('Style not available... Style must also be published in a Figma Library');
+			figma.closePlugin();
+			return;
+		}
 
 		console.log({
 			command,
@@ -47,35 +57,37 @@ export const onRun = async (event: RunEvent) => {
 
 		if (style == null) {
 			console.error(`Style not found`, { command, id: styleIdOrKey, source });
-			figma.notify('Style not found...', { error: true });
+			figma.notify('Style not found...');
 			figma.closePlugin();
 			return;
 		}
 
+		const styleId = style.id as BaseStyle['id'];
+
 		switch (command) {
 			case InputCommand.Fill:
 				selection.forEach((node) => {
-					if ('fillStyleId' in node) node.fillStyleId = style.id;
+					if ('fillStyleId' in node) node.fillStyleId = styleId;
 				});
 				break;
 			case InputCommand.Stroke:
 				selection.forEach((node) => {
-					if ('strokeStyleId' in node) node.strokeStyleId = style.id;
+					if ('strokeStyleId' in node) node.strokeStyleId = styleId;
 				});
 				break;
 			case InputCommand.Text:
 				selection.forEach((node) => {
-					if ('textStyleId' in node) node.textStyleId = style.id;
+					if ('textStyleId' in node) node.textStyleId = styleId;
 				});
 				break;
 			case InputCommand.Effect:
 				selection.forEach((node) => {
-					if ('effectStyleId' in node) node.effectStyleId = style.id;
+					if ('effectStyleId' in node) node.effectStyleId = styleId;
 				});
 				break;
 			case InputCommand.Grid:
 				selection.forEach((node) => {
-					if ('gridStyleId' in node) node.gridStyleId = style.id;
+					if ('gridStyleId' in node) node.gridStyleId = styleId;
 				});
 				break;
 			default:
