@@ -34,7 +34,7 @@ Quick actions for applying styles
   - hex by typing '#' then number
   - change hsl by typing '+' 'a10'
 - add to style names
-  - text size and line height "• 12/Auto"
+  - 
 - hide/disable local library from toggle 
   - maybe its just always toggled on?
 - storage size

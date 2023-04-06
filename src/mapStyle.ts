@@ -6,10 +6,10 @@ export function mapStyleToStorageLocal<TStyle extends BaseStyle, TStorage extend
 	mapStyleToStorage: (style: TStyle) => TStorage
 ): (style: TStyle) => TStorage {
 	return (style: TStyle) => {
-		const storageStyleLocal = mapStyleToStorage(style) 
+		const storageStyleLocal = mapStyleToStorage(style);
 		storageStyleLocal[0] = style.id;
-		storageStyleLocal[4] = true
-		return storageStyleLocal
+		storageStyleLocal[4] = true;
+		return storageStyleLocal;
 	};
 }
 
@@ -46,7 +46,14 @@ export function mapEffectStyleToStorage(style: EffectStyle): StorageEffectStyle 
 }
 
 export function mapTextStyleToStorage(style: TextStyle): StorageTextStyle {
-	return [style.key, style.name, StyleType.TEXT];
+	return [style.key, style.name, StyleType.TEXT, textStyleMeta(style)];
+}
+
+type TextStyleMeta = string;
+function textStyleMeta(style: TextStyle): TextStyleMeta {
+	const fontSize = Math.round(style.fontSize);
+	const lineHeight = style.lineHeight.unit === 'AUTO' ? 'Auto' : Math.round(style.lineHeight.value);
+	return `${fontSize}/${lineHeight}`;
 }
 
 export const rgbPaintToCss = (rgb: RGB | RGBA): CssColor => {
@@ -128,12 +135,12 @@ export type StoragePaintGradientSubStyle = [PaintGradientStyleType, GradientStop
 export type StoragePaintSubStyle = StoragePaintSolidSubStyle | StoragePaintGradientSubStyle;
 
 /** true means 'local', otherwise, the string is the Library name */
-export type StorageSource = true | string
+export type StorageSource = true | string;
 
 export type StorageBaseStyle = [BaseStyle['key'] | BaseStyle['id'], BaseStyle['name']];
 export type StoragePaintStyle = [...StorageBaseStyle, StyleType.PAINT, StoragePaintSubStyle[], StorageSource?];
 export type StorageEffectStyle = [...StorageBaseStyle, StyleType.EFFECT, EffectStyleType, StorageSource?];
 export type StorageGridStyle = [...StorageBaseStyle, StyleType.GRID, GridStyleType, StorageSource?];
-export type StorageTextStyle = [...StorageBaseStyle, StyleType.TEXT, never?, StorageSource?];
+export type StorageTextStyle = [...StorageBaseStyle, StyleType.TEXT, TextStyleMeta, StorageSource?];
 export type StorageTypeStyle = StoragePaintStyle | StorageEffectStyle | StorageGridStyle | StorageTextStyle;
-export type StorageStyle = StorageBaseStyle | StorageTypeStyle ;
+export type StorageStyle = StorageBaseStyle | StorageTypeStyle;

@@ -6,6 +6,7 @@ import {
 	setLibrarySuggestions,
 } from './manageStyles';
 import {
+	StorageTextStyle,
 	StorageTypeStyle,
 	mapEffectStyleToStorage,
 	mapGridStyleToStorage,
@@ -57,11 +58,13 @@ function setStyleSuggestions<BaseStyleT extends BaseStyle, StorageTypeStyleT ext
 	mapStyleToStorage,
 	getLibraryStyles,
 	svgIconFn,
+	displayName = defaultDisplayName,
 }: {
 	getLocalStyles: () => BaseStyleT[];
 	mapStyleToStorage: (style: BaseStyleT) => StorageTypeStyleT;
 	getLibraryStyles: () => Promise<StorageTypeStyleT[]>;
 	svgIconFn: (style: StorageTypeStyleT) => string;
+	displayName?: (style: StorageTypeStyleT) => string;
 }) {
 	let allStyleSuggestionsMemo: StyleSuggestion[] | null = null;
 	return async (result: SuggestionResults, query?: string) => {
@@ -72,19 +75,26 @@ function setStyleSuggestions<BaseStyleT extends BaseStyle, StorageTypeStyleT ext
 				data: {
 					source: style[4] === true ? 'local' : 'remote',
 					id: style[0],
-					displayName: `${style[1]} · ${style[4] === true ? '[local]' : style[4] ?? ''}`,
+					displayName: displayName(style),
 				},
 				name: style[1],
 				icon: svgIconFn(style),
 			}));
 		}
 		if (allStyleSuggestionsMemo.length === 0) {
-			result.setLoadingMessage('No styles available in this file')
+			result.setLoadingMessage('No styles available in this file');
 			return;
 		}
 		result.setSuggestions(searchSuggestions(query, allStyleSuggestionsMemo, mapDisplayName));
 	};
 }
+
+const sourceDisplayName = (source?: string | true) => `${source === true ? '[local]' : source ? `[${source}]` : ''}`;
+
+const defaultDisplayName = <StorageTypeStyleT extends StorageTypeStyle>(style: StorageTypeStyleT) =>
+	`${style[1]} - ${sourceDisplayName(style[4])}`;
+
+const textDisplayName = (style: StorageTextStyle) => `${style[1]} · ${style[3]} - ${sourceDisplayName(style[4])}`;
 
 const setPaintSuggestions = setStyleSuggestions({
 	getLocalStyles: figma.getLocalPaintStyles,
@@ -98,6 +108,7 @@ const setTextSuggestions = setStyleSuggestions({
 	mapStyleToStorage: mapTextStyleToStorage,
 	getLibraryStyles: getLibraryTextStyles,
 	svgIconFn: svgIconText,
+	displayName: textDisplayName,
 });
 
 const setGridSuggestions = setStyleSuggestions({
