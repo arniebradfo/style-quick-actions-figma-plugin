@@ -39,13 +39,11 @@ export async function publishLibraryStyles() {
 	const isUpdating = (await figma.clientStorage.getAsync(fileName)) != null;
 	await figma.clientStorage.setAsync(fileName, styles);
 
-	figma.notify(
-		`${isUpdating ? 'Updating ' : ''}Published Library Style as '${fileName}'. Now available in 'Toggle Library Styles'.`
-	);
+	const updating = isUpdating ? 'Updating ' : '';
+	figma.notify(`${updating}Published Library Style as '${fileName}'. Now available in 'Toggle Library Styles'.`);
 }
 
 export async function toggleLibrary(libraryId: string) {
-	// figma.root.getPluginData();
 	const hasLibraryId = toggleActiveLibraryId(libraryId);
 	figma.notify(`Library Styles from '${libraryId}' are toggled ${hasLibraryId ? 'ON' : 'OFF'} in this file.`);
 }
@@ -54,11 +52,12 @@ export async function setLibrarySuggestions(result: SuggestionResults, query?: s
 	result.setLoadingMessage('Loading available Styles');
 	let allLibraries = await figma.clientStorage.keysAsync();
 
-	const libraries = allLibraries.map((libraryId) => ({
-		name: libraryId,
-		// data: libraryId,
-		icon: toggle ? svgIconCheckbox(isLibraryActive(libraryId)) : undefined,
-	}));
+	const libraries = allLibraries
+		.filter((id)=>!toggle || isLibraryRemote(id)) // don't show the current library toggle in suggestions
+		.map((libraryId) => ({
+			name: libraryId,
+			icon: toggle ? svgIconCheckbox(isLibraryActive(libraryId)) : undefined,
+		}));
 
 	console.log({ allLibraries, libraries });
 	result.setSuggestions(searchSuggestions(query, libraries));
@@ -73,18 +72,20 @@ export async function removeLibrary(libraryId: string) {
 
 export async function getLibraryStyles(libraryStyleId: string, type: StyleClientStorageType) {
 	const styleClientStorage = (await figma.clientStorage.getAsync(libraryStyleId)) as StyleClientStorage;
-	return styleClientStorage[type].map(style => {
+	return styleClientStorage[type].map((style) => {
 		style[4] = libraryStyleId;
-		return style
+		return style;
 	});
 }
 export async function getAllActiveLibraryStyles(type: StyleClientStorageType) {
 	const activeLibraryIds = getActiveLibraryIds();
 	const allStyles: StorageStyle[] = [];
 	for (let i = 0; i < activeLibraryIds.length; i++) {
-		const activeLibrary = activeLibraryIds[i];
-		const styles = await getLibraryStyles(activeLibrary, type);
-		allStyles.push(...styles);
+		const activeLibraryId = activeLibraryIds[i];
+		if (isLibraryRemote(activeLibraryId)) {
+			const styles = await getLibraryStyles(activeLibraryId, type);
+			allStyles.push(...styles);
+		}
 	}
 	return allStyles;
 }
@@ -134,3 +135,6 @@ export const removeLibraryId = (libraryId: string) => {
 	activeLibraryIds.delete(libraryId);
 	setActiveLibraryIds(Array.from(activeLibraryIds.values()));
 };
+
+/** is the library not a published version of the current file */
+export const isLibraryRemote = (libraryId: string) => libraryId !== figma.root.name;

@@ -1,6 +1,9 @@
 # Style Quick Actions Figma Plugin
 Quick actions for applying styles
 
+Caveat:
+- if the filename changes
+
 (Under Development)
 
 ## Input Strategy
@@ -30,17 +33,14 @@ Quick actions for applying styles
   - ? what happens to unpublished files ?
 
 ## TODO:
-- other color functions: maybe '=' char then...
-  - hex by typing '#' then number
-  - change hsl by typing '+' 'a10'
-- add to style names
-  - 
-- hide/disable local library from toggle 
-  - maybe its just always toggled on?
+- WARN: what if there are no libraries to toggle or delete?
+- WARN: what if two libraries have the same name?
 - storage size
   - test the size limits of storage
   - notify user if size is too large
   - save size as part of the storage meta
   - display size 
-- what if there are no libraries to toggle or delete?
-- what if two libraries have the same name?
+- other color functions: maybe '=' char then...
+  - hex by typing '#' then number
+  - change hsl by typing '+' 'a10'
+
