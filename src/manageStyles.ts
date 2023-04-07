@@ -126,7 +126,7 @@ export const getLibraryTextStyles = async () => getAllActiveLibraryStyles('text'
 
 ////////
 
-export const activeLibrariesKey = 'thing'; // will need to reset storage to change this
+export const activeLibrariesKey = 'activeLibraries'; // will need to reset storage to change this
 
 export const getActiveLibraryIds = (): string[] => {
 	const activeLibraries = figma.root.getPluginData(activeLibrariesKey);
