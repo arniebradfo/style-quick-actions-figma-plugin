@@ -88,8 +88,13 @@ export async function setLibrarySuggestions(result: SuggestionResults, query?: s
 			libraries.push(suggestion);
 		}
 	}
-
 	console.log({ allLibraryIds, libraries });
+	if (libraries.length === 0) {
+		result.setLoadingMessage(
+			toggle ? `'Publish Library Styles' in other files to see them here.` : 'No Published Libraries to remove...'
+		);
+		return;
+	}
 	result.setSuggestions(searchSuggestions(query, libraries, mapDisplayName));
 }
 

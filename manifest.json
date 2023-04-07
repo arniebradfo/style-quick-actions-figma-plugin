@@ -61,7 +61,7 @@
 			"command": "toggle",
 			"parameters": [
 				{
-					"description": "Toggle a published library style to make it available in this file.",
+					"description": "Toggle a Published Library Style to make it available in this file",
 					"name": "Name",
 					"key": "toggle"
 				}
@@ -76,7 +76,7 @@
 			"command": "delete",
 			"parameters": [
 				{
-					"description": "Select a library style to remove from this plugin.",
+					"description": "Delete Library Style from plugin [00% of available storage]",
 					"name": "Name",
 					"key": "delete"
 				}
