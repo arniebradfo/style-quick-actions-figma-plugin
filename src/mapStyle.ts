@@ -25,7 +25,7 @@ export function mapPaintStyleToStorage(style: PaintStyle): StoragePaintStyle {
 			const colorStops = paint.gradientStops.map(
 				(gradientStop) => [rgbPaintToCss(gradientStop.color), gradientStop.position] as GradientStop
 			);
-			return [paintStyleType, colorStops, paint.opacity] as StoragePaintGradientSubStyle;
+			return [paintStyleType, colorStops, roundOpacity(paint.opacity || 1)] as StoragePaintGradientSubStyle;
 		}
 	});
 	return [style.key, style.name, StyleType.PAINT, paintChips];
@@ -58,8 +58,11 @@ function textStyleMeta(style: TextStyle): TextStyleMeta {
 
 export const rgbPaintToCss = (rgb: RGB | RGBA): CssColor => {
 	const { r, g, b, a = 1 } = rgb as RGBA;
-	return `rgb(${r * 255},${g * 255},${b * 255},${a})`;
+	const alpha = a >= 1 ? '' : ',' + roundOpacity(a);
+	return `rgb(${to256(r)},${to256(g)},${to256(b)}${alpha})`;
 };
+const to256 = (percent: number) => Math.round(percent * 255);
+const roundOpacity = (opacity: number) => Math.round(opacity * 100) / 100;
 
 export const rgbPaintToCssSolid = (rgb: RGB | RGBA): CssColor => rgbPaintToCss({ ...rgb, a: undefined });
 
