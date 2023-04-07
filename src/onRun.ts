@@ -1,6 +1,7 @@
 import { removeLibrary, publishLibraryStyles, toggleLibrary } from './manageStyles';
 import { SuggestionData } from './suggestion';
 import { InputCommand } from './types';
+import { figmaNotifyErrorOptions } from './utils';
 
 export const onRun = async (event: RunEvent) => {
 	const { selection } = figma.currentPage;
@@ -105,8 +106,4 @@ type _RunEvent = {
 	parameters: Record<InputCommand, SuggestionData | string>;
 };
 
-const figmaNotifyErrorOptions: NotificationOptions = {
-	error: true,
-	onDequeue: () => figma.closePlugin(),
-	timeout: 5000,
-};
+

@@ -11,6 +11,7 @@ import {
 } from './mapStyle';
 import { svgIconCheckbox } from './svgIcon';
 import { StorageSuggestion, mapDisplayName, searchSuggestions } from './suggestion';
+import { figmaNotifyErrorOptions, lengthInUtf8Bytes } from './utils';
 
 export interface StyleClientStorage {
 	paint: StoragePaintStyle[];
@@ -42,7 +43,17 @@ export async function publishLibraryStyles() {
 	console.log({ fileName, styles, styleCount, bytes, filePercentOfAllotment });
 
 	const isUpdating = (await figma.clientStorage.getAsync(fileName)) != null;
-	await figma.clientStorage.setAsync(fileName, styles);
+
+	try {
+		await figma.clientStorage.setAsync(fileName, styles);
+	} catch (error) {
+		console.error(error);
+		figma.notify(
+			`Cannot Publish. Plugin storage full. Please 'Remove Library Styles' to free up space.`,
+			figmaNotifyErrorOptions
+		);
+		return;
+	}
 
 	// const stats = `${styleCount} styles, ${filePercentOfAllotment}% of available storage`;
 	const updating = isUpdating ? 'Updating ' : '';
@@ -158,26 +169,14 @@ export const removeLibraryId = (libraryId: string) => {
 /** is the library not a published version of the current file */
 export const isLibraryRemote = (libraryId: string) => libraryId !== figma.root.name;
 
-/** https://stackoverflow.com/a/5515960/5648839 */
-function lengthInUtf8Bytes(string: string) {
-	// Matches only the 10.. bytes that are non-initial characters in a multi-byte sequence.
-	var m = encodeURIComponent(string).match(/%[89ABab]/g);
-	return string.length + (m ? m.length : 0);
-}
-
 /** https://www.figma.com/plugin-docs/api/figma-clientStorage/#:~:text=Each%20plugin%20gets%20a%20total%20of%201MB%20of%20storage */
-const figmaPluginMemoryAllotment = 1000000; // 1MB = 1 million bytes // 1e6
+export const figmaPluginMemoryAllotment = 1000000; // 1MB = 1 million bytes // 1e6
 
-const percentOfAllotment = (bytes: number) => {
-	// const percent =
+export const percentOfAllotment = (bytes: number) => {
 	return Math.round((bytes / figmaPluginMemoryAllotment) * 100 * 10) / 10;
-	// const extraZero = percent < 10 ? '0' : '';
-	// return extraZero + percent + '%';
 };
 
-const totalMemoryUsed = () => {};
-
-const libraryStats = async (libraryId: string) => {
+export const libraryStats = async (libraryId: string) => {
 	const styles = (await figma.clientStorage.getAsync(libraryId)) as StyleClientStorage;
 	const styleCount = styles.paint.length + styles.text.length + styles.effect.length + styles.grid.length;
 	const percent = percentOfAllotment(styles.bytes);
