@@ -1,6 +1,6 @@
 import { GradientStop, PaintStyleType, StoragePaintStyle } from './mapStyle';
 
-export const svgIconPaint = (style: StoragePaintStyle) => {
+export function svgIconPaint(style: StoragePaintStyle) {
 	const paints = style[3];
 	const paintChipsSvg: string[] = paints.map((paint, i) => {
 		const [type, fill, opacity] = paint;
@@ -33,7 +33,7 @@ export const svgIconPaint = (style: StoragePaintStyle) => {
 
 	// stack paint chips
 	return paintPreviewSvg(paintChipsSvg, { outline, checkerBoxes });
-};
+}
 
 const paintPreviewSvg = (fillSvg: string[], options: { outline?: boolean; checkerBoxes?: boolean } = {}) => /*svg*/ `
 	<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -82,6 +82,7 @@ const linearGradientFillSvg = (id: string | number, colorStops: SvgColorStop[], 
 		</linearGradient>
 	</defs>
 `;
+
 const radialGradientFillSvg = (id: string | number, colorStops: SvgColorStop[], opacity = 1) => /*svg*/ `
 	<circle cx="8" cy="8" r="8" fill="url(#radial-gradient-${id})" opacity="${opacity}" />
 	<defs>
@@ -97,6 +98,7 @@ interface SvgColorStop {
 	offset?: number;
 	opacity?: number;
 }
+
 const gradientColorStopsSvg = (colorStops: SvgColorStop[]) =>
 	colorStops
 		.map(
@@ -107,8 +109,10 @@ const gradientColorStopsSvg = (colorStops: SvgColorStop[]) =>
 
 const semiCircleBottomPathD = `M13.6568 13.6569C10.5326 16.781 5.46733 16.781 2.34313 
 	13.6569C-0.781061 10.5327 -0.781061 5.46734 2.34313 2.34315L13.6568 13.6569Z`;
+
 const semiCircleTopPathD = `M13.6568 2.34315C16.781 5.46734 16.781 10.5327 13.6568 
 	13.6569L2.34314 2.34315C5.46733 -0.781047 10.5327 -0.781047 13.6568 2.34315Z`;
+
 const solidFillSvg = (id: string | number, color: string, opacity = 1) => /*svg*/ `
 	<circle id="main-fill-${id}" cx="8" cy="8" r="8" fill="${color}" opacity="${opacity}" />
 	<!--<path id="half-fill-${id}" d="${semiCircleBottomPathD}" fill="${color}" />-->

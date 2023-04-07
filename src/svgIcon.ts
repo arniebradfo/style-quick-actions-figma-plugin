@@ -1,16 +1,10 @@
-import {
-	EffectStyleType,
-	GridStyleType,
-	StorageEffectStyle,
-	StorageGridStyle,
-	StorageTextStyle,
-} from './mapStyle';
+import { EffectStyleType, GridStyleType, StorageEffectStyle, StorageGridStyle, StorageTextStyle } from './mapStyle';
 
-export const svgIconText = (storageStyle: StorageTextStyle) => {
+export function svgIconText(storageStyle: StorageTextStyle) {
 	// TODO search font name for 'bold' 'italic' 'allcaps' and use a different icon...
 	return svgIcon(paths.text);
-};
-export const svgIconGrid = (storageStyle: StorageGridStyle) => {
+}
+export function svgIconGrid(storageStyle: StorageGridStyle) {
 	switch (storageStyle[3]) {
 		case GridStyleType.GRID:
 			return svgIcon(paths.grid);
@@ -19,8 +13,8 @@ export const svgIconGrid = (storageStyle: StorageGridStyle) => {
 		case GridStyleType.COLUMNS:
 			return svgIcon(paths.columns);
 	}
-};
-export const svgIconEffect = (storageStyle: StorageEffectStyle) => {
+}
+export function svgIconEffect(storageStyle: StorageEffectStyle) {
 	switch (storageStyle[3]) {
 		case EffectStyleType.DROP_SHADOW:
 			return svgIcon(paths.dropShadow);
@@ -31,7 +25,11 @@ export const svgIconEffect = (storageStyle: StorageEffectStyle) => {
 		case EffectStyleType.BACKGROUND_BLUR:
 			return svgIcon(paths.backgroundBlur);
 	}
-};
+}
+
+export function svgIconCheckbox(checked = false) {
+	return checked ? svgIcon(paths.checkboxChecked, '#3E9FEF') : svgIcon(paths.checkboxUnchecked);
+}
 
 const svgIcon = (path: string, color = 'gray') => /*svg*/ `
 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -57,8 +55,4 @@ const paths = {
 		'M2 0C0.895416 0 0 0.895447 0 2V14C0 15.1046 0.895416 16 2 16H14C15.1046 16 16 15.1046 16 14V2C16 0.895447 15.1046 0 14 0H2ZM6.5 11.9142L12.7071 5.70709L11.2929 4.29291L6.5 9.08582L4.70712 7.29291L3.29291 8.70709L6.5 11.9142Z',
 	checkboxUnchecked:
 		'M14 1H2C1.44772 1 1 1.44772 1 2V14C1 14.5523 1.44772 15 2 15H14C14.5523 15 15 14.5523 15 14V2C15 1.44772 14.5523 1 14 1ZM2 0C0.895431 0 0 0.895431 0 2V14C0 15.1046 0.895431 16 2 16H14C15.1046 16 16 15.1046 16 14V2C16 0.895431 15.1046 0 14 0H2Z',
-};
-
-export const svgIconCheckbox = (checked = false) => {
-	return checked ? svgIcon(paths.checkboxChecked, '#3E9FEF') : svgIcon(paths.checkboxUnchecked);
 };

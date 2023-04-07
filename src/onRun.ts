@@ -3,7 +3,7 @@ import { SuggestionData } from './suggestion';
 import { InputCommand } from './types';
 import { figmaNotifyErrorOptions } from './utils';
 
-export const onRun = async (event: RunEvent) => {
+export async function onRun(event: RunEvent) {
 	const { selection } = figma.currentPage;
 	const { command, parameters } = event as _RunEvent;
 	const parameterData = parameters?.[command];
@@ -13,7 +13,7 @@ export const onRun = async (event: RunEvent) => {
 		command === InputCommand.ToggleStyle ||
 		command === InputCommand.DeleteStyle
 	) {
-		const { id: libraryId } = parameterData as SuggestionData ?? {};
+		const { id: libraryId } = (parameterData as SuggestionData) ?? {};
 		switch (command) {
 			case InputCommand.ToggleStyle:
 				await toggleLibrary(libraryId);
@@ -32,7 +32,7 @@ export const onRun = async (event: RunEvent) => {
 			return;
 		}
 
-		const { id: styleIdOrKey, source } = parameterData as SuggestionData ?? {};
+		const { id: styleIdOrKey, source } = (parameterData as SuggestionData) ?? {};
 
 		let style: BaseStyle | null = null;
 		try {
@@ -99,11 +99,9 @@ export const onRun = async (event: RunEvent) => {
 	}
 
 	figma.closePlugin();
-};
+}
 
 type _RunEvent = {
 	command: InputCommand;
 	parameters: Record<InputCommand, SuggestionData | string>;
 };
-
-

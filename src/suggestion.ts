@@ -7,26 +7,29 @@ export interface SuggestionObj<DataT = any> {
 	icon?: string | Uint8Array;
 	iconUrl?: string;
 }
+
 export type Suggestion<Data = any> = SuggestionObj<Data> | string;
 
-const extract = (suggestion: Suggestion) => {
+function extract(suggestion: Suggestion) {
 	return typeof suggestion === 'string' ? suggestion : suggestion.name;
-};
+}
 
-export const searchSuggestions = <OptionType extends Suggestion>(
+export function searchSuggestions<OptionType extends Suggestion>(
 	query = '',
 	options: OptionType[] = [],
 	postMap: (option: OptionType) => OptionType = (option) => option
-): OptionType[] => {
+): OptionType[] {
 	const matches = fuzzy
 		.filter<OptionType>(query, options, { extract })
 		// .sort((a, b) => a.score - b.score)
 		.map((match) => postMap(match.original));
 	return matches;
-};
+}
 
 // alter the name after fuzzy search
-export const mapDisplayName = (d: StyleSuggestion) => (d.data?.displayName ? { ...d, name: d.data.displayName } : d);
+export function mapDisplayName(d: StyleSuggestion) {
+	return d.data?.displayName ? { ...d, name: d.data.displayName } : d;
+}
 
 export type SuggestionData = {
 	source: 'local' | 'remote';
@@ -35,4 +38,5 @@ export type SuggestionData = {
 };
 
 export type StyleSuggestion = SuggestionObj<SuggestionData>;
+
 export type StorageSuggestion = SuggestionObj<SuggestionData>;

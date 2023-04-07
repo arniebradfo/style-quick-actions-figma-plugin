@@ -56,12 +56,14 @@ function textStyleMeta(style: TextStyle): TextStyleMeta {
 	return `${fontSize}/${lineHeight}`;
 }
 
-export const rgbPaintToCss = (rgb: RGB | RGBA): CssColor => {
+export function rgbPaintToCss(rgb: RGB | RGBA): CssColor {
 	const { r, g, b, a = 1 } = rgb as RGBA;
 	const alpha = a >= 1 ? '' : ',' + roundOpacity(a);
 	return `rgb(${to256(r)},${to256(g)},${to256(b)}${alpha})`;
-};
+}
+
 const to256 = (percent: number) => Math.round(percent * 255);
+
 const roundOpacity = (opacity: number) => Math.round(opacity * 100) / 100;
 
 export const rgbPaintToCssSolid = (rgb: RGB | RGBA): CssColor => rgbPaintToCss({ ...rgb, a: undefined });
@@ -82,6 +84,7 @@ export enum PaintStyleType {
 	GRADIENT_LINEAR,
 	GRADIENT_ANGULAR,
 }
+
 const paintStyleTypeMap = {
 	SOLID: PaintStyleType.SOLID,
 	IMAGE: PaintStyleType.IMAGE,
@@ -96,6 +99,7 @@ export type PaintSolidStyleType =
 	| PaintStyleType.SOLID //
 	| PaintStyleType.IMAGE
 	| PaintStyleType.VIDEO;
+
 export type PaintGradientStyleType =
 	| PaintStyleType.GRADIENT_RADIAL
 	| PaintStyleType.GRADIENT_DIAMOND
@@ -107,6 +111,7 @@ export enum GridStyleType {
 	ROWS,
 	COLUMNS,
 }
+
 const gridStyleTypeMap = {
 	GRID: GridStyleType.GRID,
 	ROWS: GridStyleType.ROWS,
@@ -119,6 +124,7 @@ export enum EffectStyleType {
 	LAYER_BLUR,
 	BACKGROUND_BLUR,
 }
+
 const effectStyleTypeMap = {
 	DROP_SHADOW: EffectStyleType.DROP_SHADOW,
 	INNER_SHADOW: EffectStyleType.INNER_SHADOW,
@@ -141,9 +147,12 @@ export type StoragePaintSubStyle = StoragePaintSolidSubStyle | StoragePaintGradi
 export type StorageSource = true | string;
 
 export type StorageBaseStyle = [BaseStyle['key'] | BaseStyle['id'], BaseStyle['name']];
+
 export type StoragePaintStyle = [...StorageBaseStyle, StyleType.PAINT, StoragePaintSubStyle[], StorageSource?];
 export type StorageEffectStyle = [...StorageBaseStyle, StyleType.EFFECT, EffectStyleType, StorageSource?];
 export type StorageGridStyle = [...StorageBaseStyle, StyleType.GRID, GridStyleType, StorageSource?];
 export type StorageTextStyle = [...StorageBaseStyle, StyleType.TEXT, TextStyleMeta, StorageSource?];
+
 export type StorageTypeStyle = StoragePaintStyle | StorageEffectStyle | StorageGridStyle | StorageTextStyle;
+
 export type StorageStyle = StorageBaseStyle | StorageTypeStyle;

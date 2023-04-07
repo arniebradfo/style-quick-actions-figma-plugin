@@ -1,6 +1,6 @@
 import { StyleClientStorage, figmaPluginMemoryAllotment, libraryStats } from "./manageStyles";
 
-export const totalMemoryUsed = async () => {
+export async function totalMemoryUsed() {
 	let libraryIds = await figma.clientStorage.keysAsync();
 	let totalBytes = 0;
 	for (let i = 0; i < libraryIds.length; i++) {
@@ -9,11 +9,9 @@ export const totalMemoryUsed = async () => {
 		totalBytes += bytes;
 	}
 	return totalBytes;
-};
+}
 
-/// STRESS TESTING ///
-
-export const fillClientStorage = async (styles: StyleClientStorage) => {
+export async function fillClientStorage(styles: StyleClientStorage) {
 	try {
 		let i = 0;
 		let memoryUsed = 0;
@@ -26,9 +24,9 @@ export const fillClientStorage = async (styles: StyleClientStorage) => {
 	} catch (error) {
 		console.log({ error });
 	}
-};
+}
 
-export const deleteAllPluginData = async () => {
+export async function deleteAllPluginData() {
 	let globalKeys = await figma.clientStorage.keysAsync();
 	for (let i = 0; i < globalKeys.length; i++) {
 		const globalKey = globalKeys[i];
@@ -42,6 +40,6 @@ export const deleteAllPluginData = async () => {
 	console.log('deleted all plugin data');
 	console.log({ localKeys, globalKeys });
 	figma.closePlugin();
-};
+}
 
 

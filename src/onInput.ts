@@ -19,7 +19,7 @@ import { svgIconPaint } from './svgIconPaint';
 import { InputCommand, InputKey } from './types';
 import { mapDisplayName, searchSuggestions, StyleSuggestion } from './suggestion';
 
-export const onInput = async ({ parameters, key: _key, query, result }: ParameterInputEvent) => {
+export async function onInput({ parameters, key: _key, query, result }: ParameterInputEvent) {
 	const key = _key as InputKey;
 	console.log({ parameters, key, query, result });
 	result.setLoadingMessage('Loading Options'); // doesn't appear
@@ -51,7 +51,7 @@ export const onInput = async ({ parameters, key: _key, query, result }: Paramete
 		default:
 			break;
 	}
-};
+}
 
 function setStyleSuggestions<BaseStyleT extends BaseStyle, StorageTypeStyleT extends StorageTypeStyle>({
 	getLocalStyles,
@@ -89,12 +89,17 @@ function setStyleSuggestions<BaseStyleT extends BaseStyle, StorageTypeStyleT ext
 	};
 }
 
-const sourceDisplayName = (source?: string | true) => `${source === true ? '[local]' : source ? `[${source}]` : ''}`;
+function sourceDisplayName(source?: string | true) {
+	return `${source === true ? '[local]' : source ? `[${source}]` : ''}`;
+}
 
-const defaultDisplayName = <StorageTypeStyleT extends StorageTypeStyle>(style: StorageTypeStyleT) =>
-	`${style[1]} · ${sourceDisplayName(style[4])}`;
+function defaultDisplayName<StorageTypeStyleT extends StorageTypeStyle>(style: StorageTypeStyleT) {
+	return `${style[1]} · ${sourceDisplayName(style[4])}`;
+}
 
-const textDisplayName = (style: StorageTextStyle) => `${style[1]} · ${style[3]} · ${sourceDisplayName(style[4])}`;
+function textDisplayName(style: StorageTextStyle) {
+	return `${style[1]} · ${style[3]} · ${sourceDisplayName(style[4])}`;
+}
 
 const setPaintSuggestions = setStyleSuggestions({
 	getLocalStyles: figma.getLocalPaintStyles,

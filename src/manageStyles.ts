@@ -112,6 +112,7 @@ export async function getLibraryStyles(libraryStyleId: string, type: StyleClient
 		return style;
 	});
 }
+
 export async function getAllActiveLibraryStyles(type: StyleClientStorageType) {
 	const activeLibraryIds = getActiveLibraryIds();
 	const allStyles: StorageStyle[] = [];
@@ -124,24 +125,26 @@ export async function getAllActiveLibraryStyles(type: StyleClientStorageType) {
 	}
 	return allStyles;
 }
+
 export const getLibraryPaintStyles = async () => getAllActiveLibraryStyles('paint') as Promise<StoragePaintStyle[]>;
 export const getLibraryGridStyles = async () => getAllActiveLibraryStyles('grid') as Promise<StorageGridStyle[]>;
 export const getLibraryEffectStyles = async () => getAllActiveLibraryStyles('effect') as Promise<StorageEffectStyle[]>;
 export const getLibraryTextStyles = async () => getAllActiveLibraryStyles('text') as Promise<StorageTextStyle[]>;
 
-////////
+//////// SUPPORT ////////
 
 export const activeLibrariesKey = 'activeLibraries'; // will need to reset storage to change this
 
-export const getActiveLibraryIds = (): string[] => {
+export function getActiveLibraryIds(): string[] {
 	const activeLibraries = figma.root.getPluginData(activeLibrariesKey);
 	return activeLibraries ? JSON.parse(activeLibraries) : [];
-};
+}
 
-export const setActiveLibraryIds = (libraryIds: string[]) =>
-	figma.root.setPluginData(activeLibrariesKey, JSON.stringify(libraryIds));
+export function setActiveLibraryIds(libraryIds: string[]) {
+	return figma.root.setPluginData(activeLibrariesKey, JSON.stringify(libraryIds));
+}
 
-export const toggleActiveLibraryId = (libraryId: string) => {
+export function toggleActiveLibraryId(libraryId: string) {
 	// use a set to prevent duplication
 	const activeLibraryIds = new Set(getActiveLibraryIds());
 	if (activeLibraryIds.has(libraryId)) {
@@ -151,37 +154,39 @@ export const toggleActiveLibraryId = (libraryId: string) => {
 	}
 	setActiveLibraryIds(Array.from(activeLibraryIds.values()));
 	return activeLibraryIds.has(libraryId);
-};
+}
 
-export const isLibraryActive = (libraryId: string) => {
+export function isLibraryActive(libraryId: string) {
 	const activeLibraryIds = new Set(getActiveLibraryIds());
 	return activeLibraryIds.has(libraryId);
-};
+}
 
-export const addLibraryId = (libraryId: string) => {
+export function addLibraryId(libraryId: string) {
 	// use a set to prevent duplication
 	const activeLibraryIds = new Set(getActiveLibraryIds());
 	activeLibraryIds.add(libraryId);
 	setActiveLibraryIds(Array.from(activeLibraryIds.values()));
-};
-export const removeLibraryId = (libraryId: string) => {
+}
+export function removeLibraryId(libraryId: string) {
 	// use a set to prevent duplication
 	const activeLibraryIds = new Set(getActiveLibraryIds());
 	activeLibraryIds.delete(libraryId);
 	setActiveLibraryIds(Array.from(activeLibraryIds.values()));
-};
+}
 
 /** is the library not a published version of the current file */
-export const isLibraryRemote = (libraryId: string) => libraryId !== figma.root.name;
+export function isLibraryRemote(libraryId: string) {
+	return libraryId !== figma.root.name;
+}
 
 /** https://www.figma.com/plugin-docs/api/figma-clientStorage/#:~:text=Each%20plugin%20gets%20a%20total%20of%201MB%20of%20storage */
 export const figmaPluginMemoryAllotment = 1000000; // 1MB = 1 million bytes // 1e6
 
-export const percentOfAllotment = (bytes: number) => {
+export function percentOfAllotment(bytes: number) {
 	return Math.round((bytes / figmaPluginMemoryAllotment) * 100 * 10) / 10;
-};
+}
 
-export const libraryStats = async (libraryId: string) => {
+export async function libraryStats(libraryId: string) {
 	const styles = (await figma.clientStorage.getAsync(libraryId)) as StyleClientStorage;
 	const styleCount = styles.paint.length + styles.text.length + styles.effect.length + styles.grid.length;
 	const percent = percentOfAllotment(styles.bytes);
@@ -190,4 +195,4 @@ export const libraryStats = async (libraryId: string) => {
 		percent,
 		bytes: styles.bytes,
 	};
-};
+}
