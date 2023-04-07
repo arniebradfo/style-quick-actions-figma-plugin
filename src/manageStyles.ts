@@ -40,7 +40,6 @@ export async function publishLibraryStyles() {
 	const filePercentOfAllotment = percentOfAllotment(bytes);
 
 	const fileName = figma.root.name;
-	console.log({ fileName, styles, styleCount, bytes, filePercentOfAllotment });
 
 	const isUpdating = (await figma.clientStorage.getAsync(fileName)) != null;
 
@@ -88,13 +87,14 @@ export async function setLibrarySuggestions(result: SuggestionResults, query?: s
 			libraries.push(suggestion);
 		}
 	}
-	console.log({ allLibraryIds, libraries });
+
 	if (libraries.length === 0) {
 		result.setLoadingMessage(
 			toggle ? `'Publish Library Styles' in other files to see them here.` : 'No Published Libraries to remove...'
 		);
 		return;
 	}
+	
 	result.setSuggestions(searchSuggestions(query, libraries, mapDisplayName));
 }
 

@@ -49,15 +49,6 @@ export async function onRun(event: RunEvent) {
 			return;
 		}
 
-		console.log({
-			command,
-			parameters,
-			styleIdOrKey,
-			source,
-			style,
-			selection,
-		});
-
 		if (style == null) {
 			console.error(`Style not found`, { command, id: styleIdOrKey, source });
 			figma.notify('Style not found...', figmaNotifyErrorOptions);

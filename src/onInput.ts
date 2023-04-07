@@ -21,7 +21,6 @@ import { mapDisplayName, searchSuggestions, StyleSuggestion } from './suggestion
 
 export async function onInput({ parameters, key: _key, query, result }: ParameterInputEvent) {
 	const key = _key as InputKey;
-	console.log({ parameters, key, query, result });
 	result.setLoadingMessage('Loading Options'); // doesn't appear
 	switch (key) {
 		case InputCommand.Fill:
