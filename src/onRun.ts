@@ -41,8 +41,10 @@ export const onRun = async (event: RunEvent) => {
 					: figma.getStyleById(styleIdOrKey);
 		} catch (error) {
 			console.error(`Style not available`, { command, id: styleIdOrKey, source, error });
-			figma.notify('Style not available... Style must also be published in a Figma Library');
-			figma.closePlugin();
+			figma.notify(
+				'Style not available... Style must also be published in a Figma Library',
+				figmaNotifyErrorOptions
+			);
 			return;
 		}
 
@@ -57,8 +59,7 @@ export const onRun = async (event: RunEvent) => {
 
 		if (style == null) {
 			console.error(`Style not found`, { command, id: styleIdOrKey, source });
-			figma.notify('Style not found...');
-			figma.closePlugin();
+			figma.notify('Style not found...', figmaNotifyErrorOptions);
 			return;
 		}
 
@@ -91,7 +92,7 @@ export const onRun = async (event: RunEvent) => {
 				});
 				break;
 			default:
-				figma.notify('Error: Invalid Command', { error: true });
+				figma.notify('Error: Invalid Command', figmaNotifyErrorOptions);
 				break;
 		}
 	}
@@ -102,4 +103,10 @@ export const onRun = async (event: RunEvent) => {
 type _RunEvent = {
 	command: InputCommand;
 	parameters: Record<InputCommand, SuggestionData | string>;
+};
+
+const figmaNotifyErrorOptions: NotificationOptions = {
+	error: true,
+	onDequeue: () => figma.closePlugin(),
+	timeout: 5000,
 };
