@@ -18,29 +18,39 @@ export interface StyleClientStorage {
 	effect: StorageEffectStyle[];
 	grid: StorageGridStyle[];
 	saved: number;
+	bytes: number;
 }
 
-export type StyleClientStorageType = keyof Omit<StyleClientStorage, 'saved'>;
+export type StyleClientStorageType = keyof Omit<StyleClientStorage, 'saved' | 'bytes'>;
 
 export async function publishLibraryStyles() {
 	const styles: StyleClientStorage = {
-		//@ts-ignore
 		paint: figma.getLocalPaintStyles().map(mapPaintStyleToStorage),
 		text: figma.getLocalTextStyles().map(mapTextStyleToStorage),
 		effect: figma.getLocalEffectStyles().map(mapEffectStyleToStorage),
 		grid: figma.getLocalGridStyles().map(mapGridStyleToStorage),
 		saved: Date.now(),
+		bytes: 0,
 	};
 
+	const bytes = lengthInUtf8Bytes(JSON.stringify(styles));
+	styles.bytes = bytes;
+	const styleCount = styles.paint.length + styles.text.length + styles.effect.length + styles.grid.length;
+
 	const fileName = figma.root.name;
-	console.log({ fileName, styles });
-	console.log(JSON.stringify(styles)); // to test file size
+	const filePercentOfAllotment = percentOfAllotment(bytes);
+	console.log({ fileName, styles, styleCount, bytes, filePercentOfAllotment });
+	// console.log(stylesStringify); // to test file size
+	// console.log({ lengthInUtf8Bytes: lengthInUtf8Bytes(stylesStringify) });
 
 	const isUpdating = (await figma.clientStorage.getAsync(fileName)) != null;
 	await figma.clientStorage.setAsync(fileName, styles);
 
+	// const stats = `${styleCount} styles, ${filePercentOfAllotment}% of available storage`;
 	const updating = isUpdating ? 'Updating ' : '';
-	figma.notify(`${updating}Published Library Style as '${fileName}'. Now available in 'Toggle Library Styles'.`);
+	figma.notify(`${updating}Published Library Style as '${fileName}'. Now available in 'Toggle Library Styles'.`, {
+		timeout: 5000,
+	});
 }
 
 export async function toggleLibrary(libraryId: string) {
@@ -53,7 +63,7 @@ export async function setLibrarySuggestions(result: SuggestionResults, query?: s
 	let allLibraries = await figma.clientStorage.keysAsync();
 
 	const libraries = allLibraries
-		.filter((id)=>!toggle || isLibraryRemote(id)) // don't show the current library toggle in suggestions
+		.filter((id) => !toggle || isLibraryRemote(id)) // don't show the current library toggle in suggestions
 		.map((libraryId) => ({
 			name: libraryId,
 			icon: toggle ? svgIconCheckbox(isLibraryActive(libraryId)) : undefined,
@@ -138,3 +148,27 @@ export const removeLibraryId = (libraryId: string) => {
 
 /** is the library not a published version of the current file */
 export const isLibraryRemote = (libraryId: string) => libraryId !== figma.root.name;
+
+/** https://stackoverflow.com/a/5515960/5648839 */
+function lengthInUtf8Bytes(string: string) {
+	// Matches only the 10.. bytes that are non-initial characters in a multi-byte sequence.
+	var m = encodeURIComponent(string).match(/%[89ABab]/g);
+	return string.length + (m ? m.length : 0);
+}
+
+/** https://www.figma.com/plugin-docs/api/figma-clientStorage/#:~:text=Each%20plugin%20gets%20a%20total%20of%201MB%20of%20storage */
+const figmaPluginMemoryAllotment = 1000000; // 1MB = 1 million bytes // 1e6
+
+const percentOfAllotment = (bytes: number) => {
+	// const percent =
+	return Math.round((bytes / figmaPluginMemoryAllotment) * 100 * 10) / 10;
+	// const extraZero = percent < 10 ? '0' : '';
+	// return extraZero + percent + '%';
+};
+
+// const totalMemoryUsed = () => {}
+
+const libraryPercentOfAllotment = async (libraryId: string) => {
+	const clientStyleStorage = (await figma.clientStorage.getAsync(libraryId)) as StyleClientStorage;
+	return percentOfAllotment(clientStyleStorage.bytes);
+};
