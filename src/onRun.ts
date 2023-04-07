@@ -12,7 +12,7 @@ export const onRun = async (event: RunEvent) => {
 		command === InputCommand.ToggleStyle ||
 		command === InputCommand.DeleteStyle
 	) {
-		const libraryId = parameterData as string;
+		const { id: libraryId } = parameterData as SuggestionData;
 		switch (command) {
 			case InputCommand.ToggleStyle:
 				await toggleLibrary(libraryId);
@@ -42,7 +42,7 @@ export const onRun = async (event: RunEvent) => {
 		} catch (error) {
 			console.error(`Style not available`, { command, id: styleIdOrKey, source, error });
 			figma.notify(
-				'Style not available... Style must also be published in a Figma Library',
+				'Style not available... Style must also be published from a Figma Library',
 				figmaNotifyErrorOptions
 			);
 			return;

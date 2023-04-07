@@ -10,7 +10,7 @@ import {
 	StorageStyle,
 } from './mapStyle';
 import { svgIconCheckbox } from './svgIcon';
-import { searchSuggestions } from './suggestion';
+import { StorageSuggestion, mapDisplayName, searchSuggestions } from './suggestion';
 
 export interface StyleClientStorage {
 	paint: StoragePaintStyle[];
@@ -36,12 +36,10 @@ export async function publishLibraryStyles() {
 	const bytes = lengthInUtf8Bytes(JSON.stringify(styles));
 	styles.bytes = bytes;
 	const styleCount = styles.paint.length + styles.text.length + styles.effect.length + styles.grid.length;
+	const filePercentOfAllotment = percentOfAllotment(bytes);
 
 	const fileName = figma.root.name;
-	const filePercentOfAllotment = percentOfAllotment(bytes);
 	console.log({ fileName, styles, styleCount, bytes, filePercentOfAllotment });
-	// console.log(stylesStringify); // to test file size
-	// console.log({ lengthInUtf8Bytes: lengthInUtf8Bytes(stylesStringify) });
 
 	const isUpdating = (await figma.clientStorage.getAsync(fileName)) != null;
 	await figma.clientStorage.setAsync(fileName, styles);
@@ -60,17 +58,28 @@ export async function toggleLibrary(libraryId: string) {
 
 export async function setLibrarySuggestions(result: SuggestionResults, query?: string, toggle = false) {
 	result.setLoadingMessage('Loading available Styles');
-	let allLibraries = await figma.clientStorage.keysAsync();
+	let allLibraryIds = await figma.clientStorage.keysAsync();
 
-	const libraries = allLibraries
-		.filter((id) => !toggle || isLibraryRemote(id)) // don't show the current library toggle in suggestions
-		.map((libraryId) => ({
-			name: libraryId,
-			icon: toggle ? svgIconCheckbox(isLibraryActive(libraryId)) : undefined,
-		}));
+	const libraries: StorageSuggestion[] = [];
+	for (let i = 0; i < allLibraryIds.length; i++) {
+		const libraryId = allLibraryIds[i];
+		if (!toggle || isLibraryRemote(libraryId)) {
+			const { percent, styleCount } = await libraryStats(libraryId);
+			const suggestion: StorageSuggestion = {
+				data: {
+					id: libraryId,
+					displayName: `${libraryId} · [${styleCount} styles · ${percent}%]`,
+					source: isLibraryRemote(libraryId) ? 'remote' : 'local',
+				},
+				name: libraryId,
+				icon: toggle ? svgIconCheckbox(isLibraryActive(libraryId)) : undefined,
+			};
+			libraries.push(suggestion);
+		}
+	}
 
-	console.log({ allLibraries, libraries });
-	result.setSuggestions(searchSuggestions(query, libraries));
+	console.log({ allLibraryIds, libraries });
+	result.setSuggestions(searchSuggestions(query, libraries, mapDisplayName));
 }
 
 export async function removeLibrary(libraryId: string) {
@@ -166,9 +175,15 @@ const percentOfAllotment = (bytes: number) => {
 	// return extraZero + percent + '%';
 };
 
-// const totalMemoryUsed = () => {}
+const totalMemoryUsed = () => {};
 
-const libraryPercentOfAllotment = async (libraryId: string) => {
-	const clientStyleStorage = (await figma.clientStorage.getAsync(libraryId)) as StyleClientStorage;
-	return percentOfAllotment(clientStyleStorage.bytes);
+const libraryStats = async (libraryId: string) => {
+	const styles = (await figma.clientStorage.getAsync(libraryId)) as StyleClientStorage;
+	const styleCount = styles.paint.length + styles.text.length + styles.effect.length + styles.grid.length;
+	const percent = percentOfAllotment(styles.bytes);
+	return {
+		styleCount,
+		percent,
+		bytes: styles.bytes,
+	};
 };

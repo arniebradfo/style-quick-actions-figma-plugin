@@ -92,9 +92,9 @@ function setStyleSuggestions<BaseStyleT extends BaseStyle, StorageTypeStyleT ext
 const sourceDisplayName = (source?: string | true) => `${source === true ? '[local]' : source ? `[${source}]` : ''}`;
 
 const defaultDisplayName = <StorageTypeStyleT extends StorageTypeStyle>(style: StorageTypeStyleT) =>
-	`${style[1]} - ${sourceDisplayName(style[4])}`;
+	`${style[1]} · ${sourceDisplayName(style[4])}`;
 
-const textDisplayName = (style: StorageTextStyle) => `${style[1]} · ${style[3]} - ${sourceDisplayName(style[4])}`;
+const textDisplayName = (style: StorageTextStyle) => `${style[1]} · ${style[3]} · ${sourceDisplayName(style[4])}`;
 
 const setPaintSuggestions = setStyleSuggestions({
 	getLocalStyles: figma.getLocalPaintStyles,

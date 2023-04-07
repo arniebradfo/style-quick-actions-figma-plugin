@@ -38,8 +38,6 @@ Caveat:
 - storage size
   - test the size limits of storage
   - notify user if size is too large
-  - save size as part of the storage meta
-  - display size 
 - other color functions: maybe '=' char then...
   - hex by typing '#' then number
   - change hsl by typing '+' 'a10'

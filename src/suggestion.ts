@@ -35,3 +35,4 @@ export type SuggestionData = {
 };
 
 export type StyleSuggestion = SuggestionObj<SuggestionData>;
+export type StorageSuggestion = SuggestionObj<SuggestionData>;
