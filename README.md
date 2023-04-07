@@ -2,7 +2,7 @@
 Quick actions for applying styles
 
 Caveat:
-- if the filename changes
+- if the filename changes...
 
 (Under Development)
 
@@ -35,9 +35,6 @@ Caveat:
 ## TODO:
 - WARN: what if there are no libraries to toggle or delete?
 - WARN: what if two libraries have the same name?
-- storage size
-  - test the size limits of storage
-  - notify user if size is too large
 - other color functions: maybe '=' char then...
   - hex by typing '#' then number
   - change hsl by typing '+' 'a10'
