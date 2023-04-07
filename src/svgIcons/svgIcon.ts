@@ -1,9 +1,16 @@
-import { EffectStyleType, GridStyleType, StorageEffectStyle, StorageGridStyle, StorageTextStyle } from './mapStyle';
+import {
+	EffectStyleType,
+	GridStyleType,
+	StorageEffectStyle,
+	StorageGridStyle,
+	StorageTextStyle,
+} from '../manageStyles/storageTypes';
 
 export function svgIconText(storageStyle: StorageTextStyle) {
 	// TODO search font name for 'bold' 'italic' 'allcaps' and use a different icon...
 	return svgIcon(paths.text);
 }
+
 export function svgIconGrid(storageStyle: StorageGridStyle) {
 	switch (storageStyle[3]) {
 		case GridStyleType.GRID:
@@ -12,8 +19,11 @@ export function svgIconGrid(storageStyle: StorageGridStyle) {
 			return svgIcon(paths.rows);
 		case GridStyleType.COLUMNS:
 			return svgIcon(paths.columns);
+		default:
+			return '';
 	}
 }
+
 export function svgIconEffect(storageStyle: StorageEffectStyle) {
 	switch (storageStyle[3]) {
 		case EffectStyleType.DROP_SHADOW:
@@ -24,6 +34,8 @@ export function svgIconEffect(storageStyle: StorageEffectStyle) {
 			return svgIcon(paths.layerBlur);
 		case EffectStyleType.BACKGROUND_BLUR:
 			return svgIcon(paths.backgroundBlur);
+		default:
+			return '';
 	}
 }
 

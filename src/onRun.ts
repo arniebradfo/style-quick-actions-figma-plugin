@@ -1,7 +1,6 @@
-import { removeLibrary, publishLibraryStyles, toggleLibrary } from './manageStyles';
-import { SuggestionData } from './suggestion';
-import { InputCommand } from './types';
-import { figmaNotifyErrorOptions } from './utils';
+import { removeLibraryStyles, publishLibraryStyles, toggleLibraryStyles } from './manageStyles/manageStyles';
+import { SuggestionData } from './suggestions/suggestion';
+import { figmaNotifyErrorOptions, InputCommand } from './utils';
 
 export async function onRun(event: RunEvent) {
 	const { selection } = figma.currentPage;
@@ -16,13 +15,13 @@ export async function onRun(event: RunEvent) {
 		const { id: libraryId } = (parameterData as SuggestionData) ?? {};
 		switch (command) {
 			case InputCommand.ToggleStyle:
-				await toggleLibrary(libraryId);
+				await toggleLibraryStyles(libraryId);
 				break;
 			case InputCommand.PublishStyle:
 				await publishLibraryStyles();
 				break;
 			case InputCommand.DeleteStyle:
-				await removeLibrary(libraryId);
+				await removeLibraryStyles(libraryId);
 				break;
 		}
 	} else {

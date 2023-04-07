@@ -1,4 +1,4 @@
-import { GradientStop, PaintStyleType, StoragePaintStyle } from './mapStyle';
+import { GradientStop, PaintStyleType, StoragePaintStyle } from '../manageStyles/storageTypes';
 
 export function svgIconPaint(style: StoragePaintStyle) {
 	const paints = style[3];

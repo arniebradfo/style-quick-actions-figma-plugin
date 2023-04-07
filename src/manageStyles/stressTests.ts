@@ -1,4 +1,5 @@
-import { StyleClientStorage, figmaPluginMemoryAllotment, libraryStats } from "./manageStyles";
+import { figmaPluginMemoryAllotment, libraryStats } from './manageStyles';
+import { StyleClientStorage } from './storageTypes';
 
 export async function totalMemoryUsed() {
 	let libraryIds = await figma.clientStorage.keysAsync();
@@ -41,5 +42,3 @@ export async function deleteAllPluginData() {
 	console.log({ localKeys, globalKeys });
 	figma.closePlugin();
 }
-
-

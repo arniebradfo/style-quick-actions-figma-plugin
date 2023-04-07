@@ -1,28 +1,11 @@
 import {
-	StorageEffectStyle,
-	StorageGridStyle,
-	StoragePaintStyle,
-	StorageTextStyle,
 	mapPaintStyleToStorage,
 	mapGridStyleToStorage,
 	mapEffectStyleToStorage,
 	mapTextStyleToStorage,
-	StorageStyle,
-} from './mapStyle';
-import { svgIconCheckbox } from './svgIcon';
-import { StorageSuggestion, mapDisplayName, searchSuggestions } from './suggestion';
-import { figmaNotifyErrorOptions, lengthInUtf8Bytes } from './utils';
-
-export interface StyleClientStorage {
-	paint: StoragePaintStyle[];
-	text: StorageTextStyle[];
-	effect: StorageEffectStyle[];
-	grid: StorageGridStyle[];
-	saved: number;
-	bytes: number;
-}
-
-export type StyleClientStorageType = keyof Omit<StyleClientStorage, 'saved' | 'bytes'>;
+} from './mapStyleToStorage';
+import { figmaNotifyErrorOptions, lengthInUtf8Bytes } from '../utils';
+import { StyleClientStorage } from './storageTypes';
 
 export async function publishLibraryStyles() {
 	const styles: StyleClientStorage = {
@@ -61,75 +44,17 @@ export async function publishLibraryStyles() {
 	});
 }
 
-export async function toggleLibrary(libraryId: string) {
+export async function toggleLibraryStyles(libraryId: string) {
 	const hasLibraryId = toggleActiveLibraryId(libraryId);
 	figma.notify(`Library Styles from '${libraryId}' are toggled ${hasLibraryId ? 'ON' : 'OFF'} in this file.`);
 }
 
-export async function setLibrarySuggestions(result: SuggestionResults, query?: string, toggle = false) {
-	result.setLoadingMessage('Loading available Styles');
-	let allLibraryIds = await figma.clientStorage.keysAsync();
-
-	const libraries: StorageSuggestion[] = [];
-	for (let i = 0; i < allLibraryIds.length; i++) {
-		const libraryId = allLibraryIds[i];
-		if (!toggle || isLibraryRemote(libraryId)) {
-			const { percent, styleCount } = await libraryStats(libraryId);
-			const suggestion: StorageSuggestion = {
-				data: {
-					id: libraryId,
-					displayName: `${libraryId} · [${styleCount} styles · ${percent}%]`,
-					source: isLibraryRemote(libraryId) ? 'remote' : 'local',
-				},
-				name: libraryId,
-				icon: toggle ? svgIconCheckbox(isLibraryActive(libraryId)) : undefined,
-			};
-			libraries.push(suggestion);
-		}
-	}
-
-	if (libraries.length === 0) {
-		result.setLoadingMessage(
-			toggle ? `'Publish Library Styles' in other files to see them here.` : 'No Published Libraries to remove...'
-		);
-		return;
-	}
-	
-	result.setSuggestions(searchSuggestions(query, libraries, mapDisplayName));
-}
-
-export async function removeLibrary(libraryId: string) {
+export async function removeLibraryStyles(libraryId: string) {
 	figma.notify(`Deleting Library Style '${libraryId}'...`);
 	await figma.clientStorage.deleteAsync(libraryId);
 	removeLibraryId(libraryId);
 	figma.notify(`Deleted Library Style '${libraryId}'`);
 }
-
-export async function getLibraryStyles(libraryStyleId: string, type: StyleClientStorageType) {
-	const styleClientStorage = (await figma.clientStorage.getAsync(libraryStyleId)) as StyleClientStorage;
-	return styleClientStorage[type].map((style) => {
-		style[4] = libraryStyleId;
-		return style;
-	});
-}
-
-export async function getAllActiveLibraryStyles(type: StyleClientStorageType) {
-	const activeLibraryIds = getActiveLibraryIds();
-	const allStyles: StorageStyle[] = [];
-	for (let i = 0; i < activeLibraryIds.length; i++) {
-		const activeLibraryId = activeLibraryIds[i];
-		if (isLibraryRemote(activeLibraryId)) {
-			const styles = await getLibraryStyles(activeLibraryId, type);
-			allStyles.push(...styles);
-		}
-	}
-	return allStyles;
-}
-
-export const getLibraryPaintStyles = async () => getAllActiveLibraryStyles('paint') as Promise<StoragePaintStyle[]>;
-export const getLibraryGridStyles = async () => getAllActiveLibraryStyles('grid') as Promise<StorageGridStyle[]>;
-export const getLibraryEffectStyles = async () => getAllActiveLibraryStyles('effect') as Promise<StorageEffectStyle[]>;
-export const getLibraryTextStyles = async () => getAllActiveLibraryStyles('text') as Promise<StorageTextStyle[]>;
 
 //////// SUPPORT ////////
 

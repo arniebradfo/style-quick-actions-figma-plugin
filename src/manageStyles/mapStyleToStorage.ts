@@ -2,6 +2,23 @@
 // https://www.figma.com/plugin-docs/api/figma-clientStorage/#:~:text=Each%20plugin%20gets%20a%20total%20of%201MB%20of%20storage
 // We are saving only what we need for the suggestion: id, name, and svg icon data
 
+import {
+	CssColor,
+	GradientStop,
+	StorageEffectStyle,
+	StorageGridStyle,
+	StoragePaintGradientSubStyle,
+	StoragePaintSolidSubStyle,
+	StoragePaintStyle,
+	StorageTextStyle,
+	StorageTypeStyle,
+	StyleType,
+	TextStyleMeta,
+	effectStyleTypeMap,
+	gridStyleTypeMap,
+	paintStyleTypeMap,
+} from './storageTypes';
+
 export function mapStyleToStorageLocal<TStyle extends BaseStyle, TStorage extends StorageTypeStyle>(
 	mapStyleToStorage: (style: TStyle) => TStorage
 ): (style: TStyle) => TStorage {
@@ -49,7 +66,6 @@ export function mapTextStyleToStorage(style: TextStyle): StorageTextStyle {
 	return [style.key, style.name, StyleType.TEXT, textStyleMeta(style)];
 }
 
-type TextStyleMeta = string;
 function textStyleMeta(style: TextStyle): TextStyleMeta {
 	const fontSize = Math.round(style.fontSize);
 	const lineHeight = style.lineHeight.unit === 'AUTO' ? 'Auto' : Math.round(style.lineHeight.value);
@@ -67,92 +83,3 @@ const to256 = (percent: number) => Math.round(percent * 255);
 const roundOpacity = (opacity: number) => Math.round(opacity * 100) / 100;
 
 export const rgbPaintToCssSolid = (rgb: RGB | RGBA): CssColor => rgbPaintToCss({ ...rgb, a: undefined });
-
-export enum StyleType {
-	PAINT,
-	GRID,
-	EFFECT,
-	TEXT,
-}
-
-export enum PaintStyleType {
-	SOLID,
-	IMAGE,
-	VIDEO,
-	GRADIENT_RADIAL,
-	GRADIENT_DIAMOND,
-	GRADIENT_LINEAR,
-	GRADIENT_ANGULAR,
-}
-
-const paintStyleTypeMap = {
-	SOLID: PaintStyleType.SOLID,
-	IMAGE: PaintStyleType.IMAGE,
-	VIDEO: PaintStyleType.VIDEO,
-	GRADIENT_RADIAL: PaintStyleType.GRADIENT_RADIAL,
-	GRADIENT_DIAMOND: PaintStyleType.GRADIENT_DIAMOND,
-	GRADIENT_LINEAR: PaintStyleType.GRADIENT_LINEAR,
-	GRADIENT_ANGULAR: PaintStyleType.GRADIENT_ANGULAR,
-};
-
-export type PaintSolidStyleType =
-	| PaintStyleType.SOLID //
-	| PaintStyleType.IMAGE
-	| PaintStyleType.VIDEO;
-
-export type PaintGradientStyleType =
-	| PaintStyleType.GRADIENT_RADIAL
-	| PaintStyleType.GRADIENT_DIAMOND
-	| PaintStyleType.GRADIENT_LINEAR
-	| PaintStyleType.GRADIENT_ANGULAR;
-
-export enum GridStyleType {
-	GRID,
-	ROWS,
-	COLUMNS,
-}
-
-const gridStyleTypeMap = {
-	GRID: GridStyleType.GRID,
-	ROWS: GridStyleType.ROWS,
-	COLUMNS: GridStyleType.COLUMNS,
-};
-
-export enum EffectStyleType {
-	DROP_SHADOW,
-	INNER_SHADOW,
-	LAYER_BLUR,
-	BACKGROUND_BLUR,
-}
-
-const effectStyleTypeMap = {
-	DROP_SHADOW: EffectStyleType.DROP_SHADOW,
-	INNER_SHADOW: EffectStyleType.INNER_SHADOW,
-	LAYER_BLUR: EffectStyleType.LAYER_BLUR,
-	BACKGROUND_BLUR: EffectStyleType.BACKGROUND_BLUR,
-};
-
-type CssColor = string;
-type Offset = number;
-type Opacity = number;
-export type GradientStop = [CssColor, Offset, Opacity?];
-
-export type StoragePaintSolidSubStyle = [PaintSolidStyleType, CssColor, Opacity];
-
-export type StoragePaintGradientSubStyle = [PaintGradientStyleType, GradientStop[], Opacity];
-
-export type StoragePaintSubStyle = StoragePaintSolidSubStyle | StoragePaintGradientSubStyle;
-
-/** true means 'local', otherwise, the string is the Library name */
-export type StorageSource = true | string;
-
-export type StorageBaseStyle = [BaseStyle['key'] | BaseStyle['id'], BaseStyle['name']];
-
-export type StoragePaintStyle = [...StorageBaseStyle, StyleType.PAINT, StoragePaintSubStyle[], StorageSource?];
-export type StorageEffectStyle = [...StorageBaseStyle, StyleType.EFFECT, EffectStyleType, StorageSource?];
-export type StorageGridStyle = [...StorageBaseStyle, StyleType.GRID, GridStyleType, StorageSource?];
-export type StorageTextStyle = [...StorageBaseStyle, StyleType.TEXT, TextStyleMeta, StorageSource?];
-
-export type StorageTypeStyle = StoragePaintStyle | StorageEffectStyle | StorageGridStyle | StorageTextStyle;
-
-export type StorageStyle = StorageBaseStyle | StorageTypeStyle;
