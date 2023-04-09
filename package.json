@@ -1,7 +1,7 @@
 {
-	"name": "property-quick-commands-figma-plugin",
+	"name": "style-quick-actions-figma-plugin",
 	"version": "1.0.0",
-	"description": "Quick Commands for Object Property Settings",
+	"description": "Figma quick actions for applying styles",
 	"main": "dist/main.js",
 	"author": "James Bradford",
 	"license": "BSD-3-Clause",
