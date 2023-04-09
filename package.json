@@ -4,7 +4,7 @@
 	"description": "Figma quick actions for applying styles",
 	"main": "dist/main.js",
 	"author": "James Bradford",
-	"license": "BSD-3-Clause",
+	"license": "CC-BY-4.0",
 	"scripts": {
 		"start": "yarn watch",
 		"build": "webpack",

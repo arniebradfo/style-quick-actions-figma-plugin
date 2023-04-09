@@ -5,6 +5,15 @@ Quick actions for applying styles to selected including Text, Fill, Stroke, Effe
 
 Local styles will always be quickly available. No management necessary. Read below to learn how to use Team Library Styles from other files.
 
+If you want to use this plugin, visit the [Figma Plugin Page](https://www.figma.com/community/plugin/1227005108437065902).
+
+## Build
+To build this project, you need `node`, `npm` and `yarn` installed.
+```zsh
+yarn install # install dependencies
+yarn start # to start the app in watch mode
+```
+
 ## Recommended Use
 
 ### Quick Key Combos
@@ -36,7 +45,7 @@ To use Team Library Styles in another file
 - Publish your file as a [Figma 'Team Library'](https://help.figma.com/hc/en-us/articles/360041051154-Guide-to-libraries-in-Figma)
 - Publish your file by running 'Style Quick Actions > Publish Library Styles'
 - In the another file, run 'Style Quick Actions > Toggle Library Styles' and select the library
-- The Styles will now be available from in Fill, Stroke, Text, Effect, and Grid Style selectors
+- The Styles will now be available in the Fill, Stroke, Text, Effect, and Grid Style selectors
 
 You will have to update Published Styles every time the Team Library Styles are updated. 
 - Update Published Styles by running 'Style Quick Actions > Publish Library Styles' again.
@@ -46,7 +55,7 @@ Delete styles by running 'Style Quick Actions > Remove Library Styles'
 Caveats:
 - Library Styles are saved in this plugin based on their source file name. If that file name changes, the plugin will treat it as a new Published Library Style. If you change the a source file name, delete the old one and re-publish.
 - There is a [max memory limit of 1MB for each plugin](https://www.figma.com/plugin-docs/api/figma-clientStorage/#:~:text=Each%20plugin%20gets%20a%20total%20of%201MB%20of%20storage). This means there is a limited number of styles you can publish via this plugin. There is a percentage % next to the Published Style name that displays how much of the total memory each Library takes up.
-- You can't Toggle Published Styles in their own source library.
+- You can't Toggle Published Styles in their own source library. Those styles are always available locally.
 
 
 ## TODO:
