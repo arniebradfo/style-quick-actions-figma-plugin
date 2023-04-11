@@ -59,9 +59,10 @@ Caveats:
 
 
 ## TODO:
-- BUG: selecting a group should apply fill to all children
-- put the stats first? sometimes the Library names are very long...
+- put library stats first? sometimes the Library names are very long...
+  - or truncate name by char count?
 - stroke icon should have a white dot in the center
+- better instructions in a wiki - with images
 - other color functions: maybe '=' char then...
   - hex by typing '#' then number
   - change hsl by typing '+' 'a10'
