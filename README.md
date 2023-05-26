@@ -59,6 +59,7 @@ Caveats:
 
 
 ## TODO:
+- hide and don't publish names that start with underscore
 - put library stats first? sometimes the Library names are very long...
   - or truncate name by char count?
 - stroke icon should have a white dot in the center
