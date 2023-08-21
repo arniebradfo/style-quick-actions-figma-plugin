@@ -1,4 +1,4 @@
-import { getActiveLibraryIds, isLibraryRemote } from '../manageStyles/manageStyles';
+import { getActiveLibraryIds, isLibraryRemote, isPublicStyleName } from '../manageStyles/manageStyles';
 import {
 	mapEffectStyleToStorage,
 	mapGridStyleToStorage,
@@ -36,7 +36,8 @@ export async function getAllActiveLibraryStyles(type: StyleClientStorageType) {
 	for (let i = 0; i < activeLibraryIds.length; i++) {
 		const activeLibraryId = activeLibraryIds[i];
 		if (isLibraryRemote(activeLibraryId)) {
-			const styles = await getLibraryStyles(activeLibraryId, type);
+			let styles = await getLibraryStyles(activeLibraryId, type);
+			styles = styles.filter((s) => isPublicStyleName(s[1])); // shouldn't be published, but just in case
 			allStyles.push(...styles);
 		}
 	}

@@ -9,10 +9,10 @@ import { StyleClientStorage } from './storageTypes';
 
 export async function publishLibraryStyles() {
 	const styles: StyleClientStorage = {
-		paint: figma.getLocalPaintStyles().map(mapPaintStyleToStorage),
-		text: figma.getLocalTextStyles().map(mapTextStyleToStorage),
-		effect: figma.getLocalEffectStyles().map(mapEffectStyleToStorage),
-		grid: figma.getLocalGridStyles().map(mapGridStyleToStorage),
+		paint: figma.getLocalPaintStyles().filter(isPublicStyle).map(mapPaintStyleToStorage),
+		text: figma.getLocalTextStyles().filter(isPublicStyle).map(mapTextStyleToStorage),
+		effect: figma.getLocalEffectStyles().filter(isPublicStyle).map(mapEffectStyleToStorage),
+		grid: figma.getLocalGridStyles().filter(isPublicStyle).map(mapGridStyleToStorage),
 		saved: Date.now(),
 		bytes: 0,
 	};
@@ -121,3 +121,12 @@ export async function libraryStats(libraryId: string) {
 		bytes: styles.bytes,
 	};
 }
+
+function isPublicStyle<TStyle extends BaseStyle>(style: TStyle): boolean {
+	return isPublicStyleName(style.name);
+}
+
+// https://help.figma.com/hc/en-us/articles/360039238193-Hide-styles-components-and-variables-when-publishing#Hide_a_variable_collection
+// Styles are meant to be public if they or the group begins with a . or _
+export const isPublicStyleName = (name: string) =>
+	!(name[0] === '.' || name[0] === '_' || name.includes('/.') || name.includes('/_'));

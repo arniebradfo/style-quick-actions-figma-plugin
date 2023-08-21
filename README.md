@@ -59,12 +59,14 @@ Caveats:
 
 
 ## TODO:
+- stroke icon should have a white dot in the center
+- better instructions in a wiki, with images - in Playground File
+
+- support variables
+
 - apply fill and text style to subset of highlighted text
-- hide and don't publish names that start with _underscore
 - put library stats first? sometimes the Library names are very long...
   - or truncate name by char count?
-- stroke icon should have a white dot in the center
-- better instructions in a wiki - with images
 - other color functions: maybe '=' char then...
   - hex by typing '#' then number
   - change hsl by typing '+' 'a10'
