@@ -76,6 +76,8 @@ export const effectStyleTypeMap = {
 	BACKGROUND_BLUR: EffectStyleType.BACKGROUND_BLUR,
 };
 
+export type DetailedStyleType = EffectStyleType | GridStyleType | TextStyleMeta | PaintGradientStyleType | PaintSolidStyleType
+
 export type CssColor = string;
 export type Offset = number;
 export type Opacity = number;

@@ -63,6 +63,9 @@ Caveats:
 - better instructions in a wiki, with images - in Playground File
 
 - support variables
+  - Test more?
+  - add remote variables...
+  - test if variable alias resolves to null...
 
 - apply fill and text style to subset of highlighted text
 - put library stats first? sometimes the Library names are very long...

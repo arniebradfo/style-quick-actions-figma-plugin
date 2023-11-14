@@ -5,8 +5,11 @@ import {
 	mapPaintStyleToStorage,
 	mapStyleToStorageLocal,
 	mapTextStyleToStorage,
+	mapColorVariableToStorage,
 } from '../manageStyles/mapStyleToStorage';
 import {
+	DetailedStyleType,
+	PaintStyleType,
 	StorageEffectStyle,
 	StorageGridStyle,
 	StoragePaintStyle,
@@ -52,12 +55,16 @@ export const getLibraryTextStyles = async () => getAllActiveLibraryStyles('text'
 /////
 
 function setStyleSuggestions<BaseStyleT extends BaseStyle, StorageTypeStyleT extends StorageTypeStyle>({
+	getLocalVariables,
+	mapVariableToStorage,
 	getLocalStyles,
 	mapStyleToStorage,
 	getLibraryStyles,
 	svgIconFn,
 	displayName = defaultDisplayName,
 }: {
+	getLocalVariables?: () => Variable[];
+	mapVariableToStorage?: (style: Variable) => StorageTypeStyleT;
 	getLocalStyles: () => BaseStyleT[];
 	mapStyleToStorage: (style: BaseStyleT) => StorageTypeStyleT;
 	getLibraryStyles: () => Promise<StorageTypeStyleT[]>;
@@ -68,12 +75,18 @@ function setStyleSuggestions<BaseStyleT extends BaseStyle, StorageTypeStyleT ext
 	return async (result: SuggestionResults, query?: string) => {
 		if (allStyleSuggestionsMemo == null) {
 			const localStyles = getLocalStyles().map(mapStyleToStorageLocal(mapStyleToStorage));
+			const localVariables =
+				getLocalVariables && mapVariableToStorage
+					? getLocalVariables().map(mapStyleToStorageLocal(mapVariableToStorage))
+					: [];
 			const remoteStyles = await getLibraryStyles();
-			allStyleSuggestionsMemo = [...localStyles, ...remoteStyles].map((style) => ({
+			// TODO: const remoteVariables = await getLibraryVariables(); // doesn't exist
+			allStyleSuggestionsMemo = [...localStyles, ...remoteStyles, ...localVariables].map((style) => ({
 				data: {
 					source: style[4] === true ? 'local' : 'remote',
 					id: style[0],
 					displayName: displayName(style),
+					isVariable: isStyleVariable(style),
 				},
 				name: style[1],
 				icon: svgIconFn(style),
@@ -99,9 +112,22 @@ function textDisplayName(style: StorageTextStyle) {
 	return `${style[1]} · ${style[3]} · ${sourceDisplayName(style[4])}`;
 }
 
+function getLocalColorVariables() {
+	return figma.variables.getLocalVariables().filter((variable) => variable.resolvedType === 'COLOR');
+}
+
+function isStyleVariable(storageStyle: StorageTypeStyle) {
+	let styleType: DetailedStyleType = Array.isArray(storageStyle[3])
+		? storageStyle[3][0][0]
+		: (storageStyle[3] as DetailedStyleType);
+	return styleType === PaintStyleType.VARIABLE;
+}
+
 /////
 
 export const setPaintSuggestions = setStyleSuggestions({
+	getLocalVariables: getLocalColorVariables,
+	mapVariableToStorage: mapColorVariableToStorage,
 	getLocalStyles: figma.getLocalPaintStyles,
 	mapStyleToStorage: mapPaintStyleToStorage,
 	getLibraryStyles: getLibraryPaintStyles,

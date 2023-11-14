@@ -5,6 +5,7 @@
 import {
 	CssColor,
 	GradientStop,
+	PaintStyleType,
 	StorageEffectStyle,
 	StorageGridStyle,
 	StoragePaintGradientSubStyle,
@@ -19,16 +20,39 @@ import {
 	paintStyleTypeMap,
 } from './storageTypes';
 
-export function mapStyleToStorageLocal<TStyle extends BaseStyle, TStorage extends StorageTypeStyle>(
-	mapStyleToStorage: (style: TStyle) => TStorage
-): (style: TStyle) => TStorage {
-	return (style: TStyle) => {
+export function mapStyleToStorageLocal<TStyleOrVar extends BaseStyle | Variable, TStorage extends StorageTypeStyle>(
+	mapStyleToStorage: (style: TStyleOrVar) => TStorage
+): (style: TStyleOrVar) => TStorage {
+	return (style: TStyleOrVar) => {
 		const storageStyleLocal = mapStyleToStorage(style);
 		storageStyleLocal[0] = style.id;
 		storageStyleLocal[4] = true;
 		return storageStyleLocal;
 	};
 }
+
+export function mapColorVariableToStorage(variable: Variable): StoragePaintStyle {
+	// if (variable.resolvedType !== 'COLOR') return;
+
+	// call recursively till alias is resolved...
+	let variableValue: VariableValue | null = Object.values(variable.valuesByMode)[0];
+	while ((variableValue as VariableAlias)?.type === 'VARIABLE_ALIAS') {
+		const aliasedVariable = figma.variables.getVariableById((variableValue as VariableAlias).id);
+		variableValue = aliasedVariable != null ? Object.values(aliasedVariable.valuesByMode)[0] : null;
+	}
+	// if (variableValue === null) return; // TODO: what if null?
+
+	const solidPaint = variableValue as RGBA;
+
+	// TODO: The key and name shouldn't be the resolved alias?
+	return [
+		variable.key, 
+		variable.name,
+		StyleType.PAINT,
+		[[PaintStyleType.VARIABLE, rgbPaintToCssSolid(solidPaint), solidPaint.a || 1]],
+	];
+}
+export const mapColorVariableToStorageLocal = (variable: Variable) => mapColorVariableToStorage;
 
 export function mapPaintStyleToStorage(style: PaintStyle): StoragePaintStyle {
 	const paintChips = style.paints.map((paint, i) => {
@@ -39,6 +63,7 @@ export function mapPaintStyleToStorage(style: PaintStyle): StoragePaintStyle {
 		} else if (paint.type === 'IMAGE' || paint.type === 'VIDEO') {
 			return [paintStyleType, '', paint.opacity] as StoragePaintSolidSubStyle;
 		} else {
+			// (paint.type === 'GRADIENT*')
 			const colorStops = paint.gradientStops.map(
 				(gradientStop) => [rgbPaintToCss(gradientStop.color), gradientStop.position] as GradientStop
 			);
