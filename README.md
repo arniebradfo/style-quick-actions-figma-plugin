@@ -65,6 +65,7 @@ Caveats:
 - support variables
   - Test more?
   - add remote variables...
+  - Test Private/Public naming
   - test if variable alias resolves to null...
 
 - apply fill and text style to subset of highlighted text

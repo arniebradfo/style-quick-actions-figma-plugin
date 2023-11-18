@@ -44,7 +44,6 @@ export function mapColorVariableToStorage(variable: Variable): StoragePaintStyle
 
 	const solidPaint = variableValue as RGBA;
 
-	// TODO: The key and name shouldn't be the resolved alias?
 	return [
 		variable.key, 
 		variable.name,
@@ -52,7 +51,6 @@ export function mapColorVariableToStorage(variable: Variable): StoragePaintStyle
 		[[PaintStyleType.VARIABLE, rgbPaintToCssSolid(solidPaint), solidPaint.a || 1]],
 	];
 }
-export const mapColorVariableToStorageLocal = (variable: Variable) => mapColorVariableToStorage;
 
 export function mapPaintStyleToStorage(style: PaintStyle): StoragePaintStyle {
 	const paintChips = style.paints.map((paint, i) => {

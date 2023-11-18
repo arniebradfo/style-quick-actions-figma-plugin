@@ -1,4 +1,10 @@
-import { getActiveLibraryIds, isLibraryRemote, isPublicStyleName } from '../manageStyles/manageStyles';
+import {
+	getActiveLibraryIds,
+	getLocalColorVariables,
+	isLibraryRemote,
+	isPublicStyleName,
+	isStyleVariable,
+} from '../manageStyles/manageStyles';
 import {
 	mapEffectStyleToStorage,
 	mapGridStyleToStorage,
@@ -8,8 +14,6 @@ import {
 	mapColorVariableToStorage,
 } from '../manageStyles/mapStyleToStorage';
 import {
-	DetailedStyleType,
-	PaintStyleType,
 	StorageEffectStyle,
 	StorageGridStyle,
 	StoragePaintStyle,
@@ -110,17 +114,6 @@ function defaultDisplayName<StorageTypeStyleT extends StorageTypeStyle>(style: S
 
 function textDisplayName(style: StorageTextStyle) {
 	return `${style[1]} · ${style[3]} · ${sourceDisplayName(style[4])}`;
-}
-
-function getLocalColorVariables() {
-	return figma.variables.getLocalVariables().filter((variable) => variable.resolvedType === 'COLOR');
-}
-
-function isStyleVariable(storageStyle: StorageTypeStyle) {
-	let styleType: DetailedStyleType = Array.isArray(storageStyle[3])
-		? storageStyle[3][0][0]
-		: (storageStyle[3] as DetailedStyleType);
-	return styleType === PaintStyleType.VARIABLE;
 }
 
 /////

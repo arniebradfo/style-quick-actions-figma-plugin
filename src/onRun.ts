@@ -72,16 +72,14 @@ export async function onRun(event: RunEvent) {
 				nodes.forEach((node) => {
 					if (isVariable) {
 						setNodePaintToVariable(node, variable, 'fill');
-					}
-					if ('fillStyleId' in node) node.fillStyleId = styleId;
+					} else if ('fillStyleId' in node) node.fillStyleId = styleId;
 				});
 				break;
 			case InputCommand.Stroke:
 				nodes.forEach((node) => {
 					if (isVariable) {
 						setNodePaintToVariable(node, variable, 'stroke');
-					}
-					if ('strokeStyleId' in node) node.strokeStyleId = styleId;
+					} else if ('strokeStyleId' in node) node.strokeStyleId = styleId;
 				});
 				break;
 			case InputCommand.Text:
