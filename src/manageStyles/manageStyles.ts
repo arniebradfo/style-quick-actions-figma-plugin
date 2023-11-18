@@ -127,7 +127,18 @@ export async function libraryStats(libraryId: string) {
 }
 
 function isPublicStyle<TStyle extends BaseStyle | Variable>(style: TStyle): boolean {
-	return isPublicStyleName(style.name);
+	const variable = style as Variable;
+	const isVariable = variable.hiddenFromPublishing != null;
+	if (isVariable) {
+		const variableCollection = figma.variables.getVariableCollectionById(variable.variableCollectionId);
+		return (
+			!variable.hiddenFromPublishing &&
+			isPublicStyleName(variableCollection?.name || '') &&
+			isPublicStyleName(variable.name)
+		);
+	} else {
+		return isPublicStyleName(style.name);
+	}
 }
 
 // https://help.figma.com/hc/en-us/articles/360039238193-Hide-styles-components-and-variables-when-publishing#Hide_a_variable_collection

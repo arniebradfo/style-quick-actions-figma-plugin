@@ -32,6 +32,10 @@ export function mapStyleToStorageLocal<TStyleOrVar extends BaseStyle | Variable,
 }
 
 export function mapColorVariableToStorage(variable: Variable): StoragePaintStyle {
+
+	
+
+
 	let variableValue: VariableValue | null = Object.values(variable.valuesByMode)[0];
 	
 	// call recursively till alias is resolved...
