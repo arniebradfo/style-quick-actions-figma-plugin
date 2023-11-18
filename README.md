@@ -64,9 +64,7 @@ Caveats:
 
 - support variables
   - Test more?
-  - add remote variables...
-  - Test Private/Public naming
-  - test if variable alias resolves to null...
+  - add collection name to path? This is not what figma does
 
 - apply fill and text style to subset of highlighted text
 - put library stats first? sometimes the Library names are very long...
