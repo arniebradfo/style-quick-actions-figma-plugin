@@ -32,12 +32,14 @@ export function mapStyleToStorageLocal<TStyleOrVar extends BaseStyle | Variable,
 }
 
 export function mapColorVariableToStorage(variable: Variable): StoragePaintStyle {
-	// call recursively till alias is resolved...
 	let variableValue: VariableValue | null = Object.values(variable.valuesByMode)[0];
+	
+	// call recursively till alias is resolved...
 	while ((variableValue as VariableAlias)?.type === 'VARIABLE_ALIAS') {
 		const aliasedVariable = figma.variables.getVariableById((variableValue as VariableAlias).id);
 		variableValue = aliasedVariable != null ? Object.values(aliasedVariable.valuesByMode)[0] : null;
 	}
+	
 	const solidPaint = variableValue === null || variable.resolvedType !== 'COLOR' ? grayRGBA : (variableValue as RGBA);
 
 	return [
