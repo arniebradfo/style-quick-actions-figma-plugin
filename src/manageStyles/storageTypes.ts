@@ -20,6 +20,7 @@ export enum PaintStyleType {
 	SOLID,
 	IMAGE,
 	VIDEO,
+	VARIABLE,
 	GRADIENT_RADIAL,
 	GRADIENT_DIAMOND,
 	GRADIENT_LINEAR,
@@ -30,6 +31,7 @@ export const paintStyleTypeMap = {
 	SOLID: PaintStyleType.SOLID,
 	IMAGE: PaintStyleType.IMAGE,
 	VIDEO: PaintStyleType.VIDEO,
+	VARIABLE: PaintStyleType.VARIABLE,
 	GRADIENT_RADIAL: PaintStyleType.GRADIENT_RADIAL,
 	GRADIENT_DIAMOND: PaintStyleType.GRADIENT_DIAMOND,
 	GRADIENT_LINEAR: PaintStyleType.GRADIENT_LINEAR,
@@ -39,6 +41,7 @@ export const paintStyleTypeMap = {
 export type PaintSolidStyleType =
 	| PaintStyleType.SOLID //
 	| PaintStyleType.IMAGE
+	| PaintStyleType.VARIABLE
 	| PaintStyleType.VIDEO;
 
 export type PaintGradientStyleType =
@@ -72,6 +75,8 @@ export const effectStyleTypeMap = {
 	LAYER_BLUR: EffectStyleType.LAYER_BLUR,
 	BACKGROUND_BLUR: EffectStyleType.BACKGROUND_BLUR,
 };
+
+export type DetailedStyleType = EffectStyleType | GridStyleType | TextStyleMeta | PaintGradientStyleType | PaintSolidStyleType
 
 export type CssColor = string;
 export type Offset = number;

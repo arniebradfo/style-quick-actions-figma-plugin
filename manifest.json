@@ -3,7 +3,14 @@
 	"id": "1227005108437065902",
 	"api": "1.0.0",
 	"main": "dist/main.js",
-	"editorType": ["figma"],
+	"editorType": [
+		"figma"
+	],
+	"networkAccess": {
+		"allowedDomains": [
+			"none"
+		]
+	},
 	"menu": [
 		{
 			"name": "Fill",
@@ -55,7 +62,9 @@
 				}
 			]
 		},
-		{ "separator": true },
+		{
+			"separator": true
+		},
 		{
 			"name": "Toggle Library Styles",
 			"command": "toggle",

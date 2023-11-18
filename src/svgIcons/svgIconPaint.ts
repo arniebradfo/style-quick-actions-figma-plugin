@@ -2,6 +2,12 @@ import { GradientStop, PaintStyleType, StoragePaintStyle } from '../manageStyles
 
 export function svgIconPaint(style: StoragePaintStyle) {
 	const paints = style[3];
+	const [firstType, firstFill, firstOpacity] = paints[0];
+
+	if (firstType === PaintStyleType.VARIABLE) {
+		return variablePreviewSvg(firstFill, firstOpacity);
+	}
+
 	const paintChipsSvg: string[] = paints.map((paint, i) => {
 		const [type, fill, opacity] = paint;
 		if (type === PaintStyleType.SOLID) {
@@ -23,28 +29,30 @@ export function svgIconPaint(style: StoragePaintStyle) {
 		}
 	});
 
-	// const sumOpacity = style.paints.reduce((accumulator, paint) => accumulator + (paint.opacity || 1), 0);
-	// const outline = sumOpacity < 0.2;
-	const outline = true; // to be sure
-
-	const [firstType, firstFill, firstOpacity] = paints[0];
 	const checkerBoxes =
 		paints.length === 1 && firstType === PaintStyleType.SOLID && firstOpacity != null && firstOpacity < 1;
 
-	// stack paint chips
-	return paintPreviewSvg(paintChipsSvg, { outline, checkerBoxes });
+	return paintPreviewSvg(paintChipsSvg, { checkerBoxes });
 }
 
-const paintPreviewSvg = (fillSvg: string[], options: { outline?: boolean; checkerBoxes?: boolean } = {}) => /*svg*/ `
+const paintPreviewSvg = (fillSvg: string[], options: { checkerBoxes?: boolean } = {}) => /*svg*/ `
 	<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
 		${options.checkerBoxes ? checkerBoxesSvg() : ''}
 		${fillSvg.join('\n')}
-		${options.outline ? outlineSvg() : ''}
+		${outlineSvg['circle']}
+	</svg>
+`;
+
+const variablePreviewSvg = (fill: string, opacity = 1) => /*svg*/ `
+	<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+		${squareSvg(1, fill)}
+		${opacity !== 1 ? checkerBoxesSvg('semiSquare', 1 - opacity) : ''}
+		${outlineSvg['square']}
 	</svg>
 `;
 
 const videoFillIconSvg = (id: string | number, iconColor = '#000000', opacity = 1) => /*svg*/ `
-	<g id="video-icon-${id}"  opacity="${opacity}">
+	<g id="video-icon-${id}" opacity="${opacity}">
 		<circle cx="8" cy="8" r="8" fill="gray" />
 		<path 
 			fill-rule="evenodd" 
@@ -113,24 +121,35 @@ const semiCircleBottomPathD = `M13.6568 13.6569C10.5326 16.781 5.46733 16.781 2.
 const semiCircleTopPathD = `M13.6568 2.34315C16.781 5.46734 16.781 10.5327 13.6568 
 	13.6569L2.34314 2.34315C5.46733 -0.781047 10.5327 -0.781047 13.6568 2.34315Z`;
 
-const solidFillSvg = (id: string | number, color: string, opacity = 1) => /*svg*/ `
+const solidFillSvg = (id: string | number, color = 'black', opacity = 1) => /*svg*/ `
 	<circle id="main-fill-${id}" cx="8" cy="8" r="8" fill="${color}" opacity="${opacity}" />
 	<!--<path id="half-fill-${id}" d="${semiCircleBottomPathD}" fill="${color}" />-->
 `;
 
-const outlineSvg = (outlineColor = 'gray') => /*svg*/ `
-	<circle id="outline" cx="8" cy="8" r="7.75" stroke="${outlineColor}" stroke-width="0.5" opacity="0.2"  />
-`;
+const squareSvg = (id: string | number, color = 'black', opacity = 1) =>
+	/*svg*/ `<rect id="main-fill-${id}" height="16" width="16" rx="1" fill="${color}" opacity="${opacity}" />`;
 
-const checkerBoxesSvg = (checkerBoxColor = '#E1E1E1', isFull = false) => /*svg*/ `
+const outlineColor = 'gray';
+const outlineSvg = {
+	circle: /*svg*/ `<circle id="outline" cx="8" cy="8" r="7.75" stroke="${outlineColor}" stroke-width="0.5" opacity="0.2" />`,
+	square: /*svg*/ `<rect id="outline" height="15.5" width="15.5" rx="1.5" x="0.25" y="0.25" stroke="${outlineColor}" stroke-width="0.5" opacity="0.2" />`,
+};
+type OutlineShape = keyof typeof outlineSvg;
+
+const checkboxMaskShapesSvg = {
+	circle: /*svg*/ `<circle id="checker-box-mask-circle" cx="8" cy="8" r="8" fill="black" />`,
+	semiCircle: /*svg*/ `<path id="checker-box-mask-semicircle" d="${semiCircleTopPathD}" fill="black" />`,
+	square: /*svg*/ `<rect id="checker-box-mask-square" height="16" width="16" rx="1" fill="black" />`,
+	semiSquare: /*svg*/ `<rect id="checker-box-mask-square" height="16" width="8" x="8" fill="black" />`,
+};
+type MaskShape = keyof typeof checkboxMaskShapesSvg;
+
+const checkerBoxColor = '#E1E1E1';
+const checkerBoxesSvg = (shape: MaskShape = 'semiCircle', opacity = 1) => /*svg*/ `
 	<mask id="checker-box-mask" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="16" height="16">
-		${
-			isFull
-				? /*svg*/ `<circle id="checker-box-mask-circle" cx="8" cy="8" r="8" fill="black" />`
-				: /*svg*/ `<path id="checker-box-mask-semicircle" d="${semiCircleTopPathD}" fill="black" />`
-		}
+		${checkboxMaskShapesSvg[shape]}
 	</mask>
-	<g id="checker-box" mask="url(#checker-box-mask)">
+	<g id="checker-box" mask="url(#checker-box-mask)" opacity="${opacity}">
 		<rect width="16" height="16" fill="white" />
 		<path d="M0 0H3V3H0V0Z" fill="${checkerBoxColor}" />
 		<path d="M0 6H3V9H0V6Z" fill="${checkerBoxColor}" />

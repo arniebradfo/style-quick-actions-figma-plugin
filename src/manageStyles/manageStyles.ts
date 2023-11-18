@@ -3,13 +3,17 @@ import {
 	mapGridStyleToStorage,
 	mapEffectStyleToStorage,
 	mapTextStyleToStorage,
+	mapColorVariableToStorage,
 } from './mapStyleToStorage';
 import { figmaNotifyErrorOptions, lengthInUtf8Bytes } from '../utils';
-import { StyleClientStorage } from './storageTypes';
+import { DetailedStyleType, PaintStyleType, StorageTypeStyle, StyleClientStorage } from './storageTypes';
 
 export async function publishLibraryStyles() {
 	const styles: StyleClientStorage = {
-		paint: figma.getLocalPaintStyles().filter(isPublicStyle).map(mapPaintStyleToStorage),
+		paint: [
+			...figma.getLocalPaintStyles().filter(isPublicStyle).map(mapPaintStyleToStorage),
+			...getLocalColorVariables().filter(isPublicStyle).map(mapColorVariableToStorage),
+		],
 		text: figma.getLocalTextStyles().filter(isPublicStyle).map(mapTextStyleToStorage),
 		effect: figma.getLocalEffectStyles().filter(isPublicStyle).map(mapEffectStyleToStorage),
 		grid: figma.getLocalGridStyles().filter(isPublicStyle).map(mapGridStyleToStorage),
@@ -122,11 +126,33 @@ export async function libraryStats(libraryId: string) {
 	};
 }
 
-function isPublicStyle<TStyle extends BaseStyle>(style: TStyle): boolean {
-	return isPublicStyleName(style.name);
+function isPublicStyle<TStyle extends BaseStyle | Variable>(style: TStyle): boolean {
+	const variable = style as Variable;
+	const isVariable = variable.hiddenFromPublishing != null;
+	if (isVariable) {
+		const variableCollection = figma.variables.getVariableCollectionById(variable.variableCollectionId);
+		return (
+			!variable.hiddenFromPublishing &&
+			isPublicStyleName(variableCollection?.name || '') &&
+			isPublicStyleName(variable.name)
+		);
+	} else {
+		return isPublicStyleName(style.name);
+	}
 }
 
 // https://help.figma.com/hc/en-us/articles/360039238193-Hide-styles-components-and-variables-when-publishing#Hide_a_variable_collection
 // Styles are meant to be public if they or the group begins with a . or _
 export const isPublicStyleName = (name: string) =>
 	!(name[0] === '.' || name[0] === '_' || name.includes('/.') || name.includes('/_'));
+
+export function getLocalColorVariables() {
+	return figma.variables.getLocalVariables().filter((variable) => variable.resolvedType === 'COLOR');
+}
+
+export function isStyleVariable(storageStyle: StorageTypeStyle) {
+	let styleType: DetailedStyleType = Array.isArray(storageStyle[3])
+		? storageStyle[3][0][0]
+		: (storageStyle[3] as DetailedStyleType);
+	return styleType === PaintStyleType.VARIABLE;
+}

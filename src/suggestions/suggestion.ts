@@ -35,6 +35,7 @@ export type SuggestionData = {
 	source: 'local' | 'remote';
 	id: string;
 	displayName?: string;
+	isVariable?: boolean;
 };
 
 export type StyleSuggestion = SuggestionObj<SuggestionData>;

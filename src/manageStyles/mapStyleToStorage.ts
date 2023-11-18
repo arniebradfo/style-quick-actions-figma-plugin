@@ -5,6 +5,7 @@
 import {
 	CssColor,
 	GradientStop,
+	PaintStyleType,
 	StorageEffectStyle,
 	StorageGridStyle,
 	StoragePaintGradientSubStyle,
@@ -19,15 +20,38 @@ import {
 	paintStyleTypeMap,
 } from './storageTypes';
 
-export function mapStyleToStorageLocal<TStyle extends BaseStyle, TStorage extends StorageTypeStyle>(
-	mapStyleToStorage: (style: TStyle) => TStorage
-): (style: TStyle) => TStorage {
-	return (style: TStyle) => {
+export function mapStyleToStorageLocal<TStyleOrVar extends BaseStyle | Variable, TStorage extends StorageTypeStyle>(
+	mapStyleToStorage: (style: TStyleOrVar) => TStorage
+): (style: TStyleOrVar) => TStorage {
+	return (style: TStyleOrVar) => {
 		const storageStyleLocal = mapStyleToStorage(style);
 		storageStyleLocal[0] = style.id;
 		storageStyleLocal[4] = true;
 		return storageStyleLocal;
 	};
+}
+
+export function mapColorVariableToStorage(variable: Variable): StoragePaintStyle {
+
+	
+
+
+	let variableValue: VariableValue | null = Object.values(variable.valuesByMode)[0];
+	
+	// call recursively till alias is resolved...
+	while ((variableValue as VariableAlias)?.type === 'VARIABLE_ALIAS') {
+		const aliasedVariable = figma.variables.getVariableById((variableValue as VariableAlias).id);
+		variableValue = aliasedVariable != null ? Object.values(aliasedVariable.valuesByMode)[0] : null;
+	}
+	
+	const solidPaint = variableValue === null || variable.resolvedType !== 'COLOR' ? grayRGBA : (variableValue as RGBA);
+
+	return [
+		variable.key,
+		variable.name,
+		StyleType.PAINT,
+		[[PaintStyleType.VARIABLE, rgbPaintToCssSolid(solidPaint), solidPaint.a || 1]],
+	];
 }
 
 export function mapPaintStyleToStorage(style: PaintStyle): StoragePaintStyle {
@@ -39,6 +63,7 @@ export function mapPaintStyleToStorage(style: PaintStyle): StoragePaintStyle {
 		} else if (paint.type === 'IMAGE' || paint.type === 'VIDEO') {
 			return [paintStyleType, '', paint.opacity] as StoragePaintSolidSubStyle;
 		} else {
+			// (paint.type === 'GRADIENT*')
 			const colorStops = paint.gradientStops.map(
 				(gradientStop) => [rgbPaintToCss(gradientStop.color), gradientStop.position] as GradientStop
 			);
@@ -81,5 +106,12 @@ export function rgbPaintToCss(rgb: RGB | RGBA): CssColor {
 const to256 = (percent: number) => Math.round(percent * 255);
 
 const roundOpacity = (opacity: number) => Math.round(opacity * 100) / 100;
+
+const grayRGBA: RGBA = {
+	r: 125,
+	g: 125,
+	b: 125,
+	a: 1,
+};
 
 export const rgbPaintToCssSolid = (rgb: RGB | RGBA): CssColor => rgbPaintToCss({ ...rgb, a: undefined });

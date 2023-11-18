@@ -63,6 +63,8 @@ Caveats:
 - better instructions in a wiki, with images - in Playground File
 
 - support variables
+  - Test more?
+  - add collection name to path? This is not what figma does
 
 - apply fill and text style to subset of highlighted text
 - put library stats first? sometimes the Library names are very long...

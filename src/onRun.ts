@@ -34,14 +34,21 @@ export async function onRun(event: RunEvent) {
 
 		const nodes = flattenGroupChildren(selection);
 
-		const { id: styleIdOrKey, source } = (parameterData as SuggestionData) ?? {};
+		const { id: styleIdOrKey, source, isVariable } = (parameterData as SuggestionData) ?? {};
 
-		let style: BaseStyle | null = null;
+		let style: BaseStyle | Variable | null = null;
 		try {
-			style =
-				source === 'remote'
-					? await figma.importStyleByKeyAsync(styleIdOrKey)
-					: figma.getStyleById(styleIdOrKey);
+			if (isVariable) {
+				style =
+					source === 'remote'
+						? await figma.variables.importVariableByKeyAsync(styleIdOrKey)
+						: figma.variables.getVariableById(styleIdOrKey);
+			} else {
+				style =
+					source === 'remote'
+						? await figma.importStyleByKeyAsync(styleIdOrKey)
+						: figma.getStyleById(styleIdOrKey);
+			}
 		} catch (error) {
 			console.error(`Style not available`, { command, id: styleIdOrKey, source, error });
 			figma.notify(
@@ -58,16 +65,21 @@ export async function onRun(event: RunEvent) {
 		}
 
 		const styleId = style.id as BaseStyle['id'];
+		const variable = style as Variable;
 
 		switch (command) {
 			case InputCommand.Fill:
 				nodes.forEach((node) => {
-					if ('fillStyleId' in node) node.fillStyleId = styleId;
+					if (isVariable) {
+						setNodePaintToVariable(node, variable, 'fill');
+					} else if ('fillStyleId' in node) node.fillStyleId = styleId;
 				});
 				break;
 			case InputCommand.Stroke:
 				nodes.forEach((node) => {
-					if ('strokeStyleId' in node) node.strokeStyleId = styleId;
+					if (isVariable) {
+						setNodePaintToVariable(node, variable, 'stroke');
+					} else if ('strokeStyleId' in node) node.strokeStyleId = styleId;
 				});
 				break;
 			case InputCommand.Text:
@@ -101,4 +113,12 @@ type _RunEvent = {
 
 function flattenGroupChildren(nodes: readonly SceneNode[]): SceneNode[] {
 	return nodes.flatMap((node) => (node.type === 'GROUP' ? flattenGroupChildren(node.children) : node));
+}
+
+function setNodePaintToVariable(node: SceneNode, colorVariable: Variable, type: 'fill' | 'stroke') {
+	const boundPaint = [
+		figma.variables.setBoundVariableForPaint(figma.util.solidPaint('#000000'), 'color', colorVariable),
+	];
+	if (type === 'fill' && 'fills' in node) node.fills = boundPaint;
+	if (type === 'stroke' && 'strokes' in node) node.strokes = boundPaint;
 }
