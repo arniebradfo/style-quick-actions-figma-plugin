@@ -32,20 +32,16 @@ export function mapStyleToStorageLocal<TStyleOrVar extends BaseStyle | Variable,
 }
 
 export function mapColorVariableToStorage(variable: Variable): StoragePaintStyle {
-	// if (variable.resolvedType !== 'COLOR') return;
-
 	// call recursively till alias is resolved...
 	let variableValue: VariableValue | null = Object.values(variable.valuesByMode)[0];
 	while ((variableValue as VariableAlias)?.type === 'VARIABLE_ALIAS') {
 		const aliasedVariable = figma.variables.getVariableById((variableValue as VariableAlias).id);
 		variableValue = aliasedVariable != null ? Object.values(aliasedVariable.valuesByMode)[0] : null;
 	}
-	// if (variableValue === null) return; // TODO: what if null?
-
-	const solidPaint = variableValue as RGBA;
+	const solidPaint = variableValue === null || variable.resolvedType !== 'COLOR' ? grayRGBA : (variableValue as RGBA);
 
 	return [
-		variable.key, 
+		variable.key,
 		variable.name,
 		StyleType.PAINT,
 		[[PaintStyleType.VARIABLE, rgbPaintToCssSolid(solidPaint), solidPaint.a || 1]],
@@ -104,5 +100,12 @@ export function rgbPaintToCss(rgb: RGB | RGBA): CssColor {
 const to256 = (percent: number) => Math.round(percent * 255);
 
 const roundOpacity = (opacity: number) => Math.round(opacity * 100) / 100;
+
+const grayRGBA: RGBA = {
+	r: 125,
+	g: 125,
+	b: 125,
+	a: 1,
+};
 
 export const rgbPaintToCssSolid = (rgb: RGB | RGBA): CssColor => rgbPaintToCss({ ...rgb, a: undefined });
