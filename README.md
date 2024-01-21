@@ -1,4 +1,4 @@
-![Plugin Cover Art](./assets/CoverArt.png)
+![Cover Art](./assets/CoverArt.png)
 
 # Style Quick Actions - Figma Plugin
 Quick actions for applying styles to selected including Text, Fill, Stroke, Effect, and Grid. Works with local styles and published Team Library styles.
@@ -64,6 +64,7 @@ Caveats:
 
 - support variables
   - Test more?
+  - show correct color based on variable mode - look at selected item, its mode, and select the correct instance of color based on that mode? This would require saving more information?
   - add collection name to path? This is not what figma does
 
 - apply fill and text style to subset of highlighted text
@@ -75,4 +76,4 @@ Caveats:
 
 --- 
 
-![Plugin Cover Art](./assets/Icon.png)
+![Icon](./assets/Icon.svg)
