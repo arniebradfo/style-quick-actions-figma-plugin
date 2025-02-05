@@ -59,6 +59,7 @@ Caveats:
 
 
 ## TODO:
+- Deprecated APIs: https://www.figma.com/plugin-docs/updates/2024/02/21/version-1-update-87/
 - stroke icon should have a white dot in the center
 - better instructions in a wiki, with images - in Playground File
 
