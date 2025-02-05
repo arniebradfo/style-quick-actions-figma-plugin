@@ -30,7 +30,11 @@ import { svgIconPaint } from '../svgIcons/svgIconPaint';
 /////
 
 export async function getLibraryStyles(libraryStyleId: string, type: StyleClientStorageType) {
-	const styleClientStorage = (await figma.clientStorage.getAsync(libraryStyleId)) as StyleClientStorage;
+	const styleClientStorage = (await figma.clientStorage.getAsync(libraryStyleId)) as StyleClientStorage | undefined;
+	if (styleClientStorage == null) {
+		// libraryStyleId is orphaned run // validateActiveLibraryIds(); // but only works onRun
+		return [];
+	}
 	return styleClientStorage[type].map((style) => {
 		style[4] = libraryStyleId;
 		return style;
@@ -44,7 +48,7 @@ export async function getAllActiveLibraryStyles(type: StyleClientStorageType) {
 		const activeLibraryId = activeLibraryIds[i];
 		if (isLibraryRemote(activeLibraryId)) {
 			let styles = await getLibraryStyles(activeLibraryId, type);
-			styles = styles.filter((s) => isPublicStyleName(s[1])); // shouldn't be published, but just in case
+			styles = styles.filter((style) => isPublicStyleName(style[1])); // shouldn't be published, but just in case
 			allStyles.push(...styles);
 		}
 	}

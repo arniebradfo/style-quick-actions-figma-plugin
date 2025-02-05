@@ -1,10 +1,14 @@
-import { removeLibraryStyles, publishLibraryStyles, toggleLibraryStyles } from './manageStyles/manageStyles';
+import { removeLibraryStyles, publishLibraryStyles, toggleLibraryStyles, validateActiveLibraryIds } from './manageStyles/manageStyles';
 import { SuggestionData } from './suggestions/suggestion';
 import { figmaNotifyErrorOptions, InputCommand } from './utils';
 
 export async function onRun(event: RunEvent) {
 	const { command, parameters } = event as _RunEvent;
 	const parameterData = parameters?.[command];
+
+	// the need for validation is extremely rare, but we run it every time
+	// could conditionally run it after invalid detected in getLibraryStyles
+	validateActiveLibraryIds();
 
 	if (
 		command === InputCommand.PublishStyle ||

@@ -1,10 +1,10 @@
 import { StorageSuggestion, mapDisplayName, searchSuggestions } from './suggestion';
 import { svgIconCheckbox } from '../svgIcons/svgIcon';
-import { isLibraryActive, isLibraryRemote, libraryStats } from '../manageStyles/manageStyles';
+import { getLibraryIds, isLibraryActive, isLibraryRemote, libraryStats } from '../manageStyles/manageStyles';
 
 export async function setLibrarySuggestions(result: SuggestionResults, query?: string, toggle = false) {
 	result.setLoadingMessage('Loading available Styles');
-	let allLibraryIds = await figma.clientStorage.keysAsync();
+	let allLibraryIds = await getLibraryIds();
 
 	const libraries: StorageSuggestion[] = [];
 	for (let i = 0; i < allLibraryIds.length; i++) {

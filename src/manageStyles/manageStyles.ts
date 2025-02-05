@@ -90,12 +90,34 @@ export function isLibraryActive(libraryId: string) {
 	return activeLibraryIds.has(libraryId);
 }
 
+/**
+ * if a library is deleted in file1 while active in file2, its id becomes orphaned in file2 activeLibraryIds
+ * validateActiveLibraryIds cleans up orphans
+ */
+export async function validateActiveLibraryIds() {
+	const libraryIds = await getLibraryIds();
+	const activeLibraryIds = getActiveLibraryIds();
+	const libraryIdsSet = new Set(libraryIds);
+	activeLibraryIds.forEach((activeLibraryId) => {
+		if (!libraryIdsSet.has(activeLibraryId)) {
+			console.log(`Deleting orphan activeLibraryId: ${activeLibraryId}`);
+			removeLibraryId(activeLibraryId);
+		}
+	});
+}
+
+export async function getLibraryIds() {
+	const libraryIds = await figma.clientStorage.keysAsync();
+	return libraryIds;
+}
+
 export function addLibraryId(libraryId: string) {
 	// use a set to prevent duplication
 	const activeLibraryIds = new Set(getActiveLibraryIds());
 	activeLibraryIds.add(libraryId);
 	setActiveLibraryIds(Array.from(activeLibraryIds.values()));
 }
+
 export function removeLibraryId(libraryId: string) {
 	// use a set to prevent duplication
 	const activeLibraryIds = new Set(getActiveLibraryIds());
