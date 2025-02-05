@@ -23,8 +23,8 @@ export async function publishLibraryStyles() {
 
 	const bytes = lengthInUtf8Bytes(JSON.stringify(styles));
 	styles.bytes = bytes;
-	const styleCount = styles.paint.length + styles.text.length + styles.effect.length + styles.grid.length;
-	const filePercentOfAllotment = percentOfAllotment(bytes);
+	// const styleCount = styles.paint.length + styles.text.length + styles.effect.length + styles.grid.length;
+	// const filePercentOfAllotment = percentOfAllotment(bytes);
 
 	const fileName = figma.root.name;
 
