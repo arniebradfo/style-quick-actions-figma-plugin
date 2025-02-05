@@ -7,10 +7,10 @@
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz#1d572bfbbe14b7704e0ba0f39b74815b84870d70"
   integrity sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==
 
-"@figma/plugin-typings@^1.80.0":
-  version "1.80.0"
-  resolved "https://registry.yarnpkg.com/@figma/plugin-typings/-/plugin-typings-1.80.0.tgz#8044e52145c4534d0ae6a3f80bb5ee4bf5cbcbfe"
-  integrity sha512-dosTVp5wj8u0pn5/pP+Ii7u/iurwbhEkT9kNbxkyrRf59cjsfbMKw5i7PyRrOUOyBmsH3edhCfh9jMff7G6tjQ==
+"@figma/plugin-typings@^1.106.0":
+  version "1.106.0"
+  resolved "https://registry.yarnpkg.com/@figma/plugin-typings/-/plugin-typings-1.106.0.tgz#3145a3c3d1ad90eba5c60329f78583376f9f49e3"
+  integrity sha512-fUWranOKUEDJe80GUAgs7gLyMdkiBdwi72QPx1XctB62ecmedpTO/qKx/C7GcoxeRVQ90n+NWS7zpSInWMTJkA==
 
 "@jridgewell/gen-mapping@^0.3.0":
   version "0.3.2"
@@ -846,10 +846,10 @@ to-regex-range@^5.0.1:
   dependencies:
     is-number "^7.0.0"
 
-ts-loader@^9.5.0:
-  version "9.5.0"
-  resolved "https://registry.yarnpkg.com/ts-loader/-/ts-loader-9.5.0.tgz#f0a51dda37cc4d8e43e6cb14edebbc599b0c3aa2"
-  integrity sha512-LLlB/pkB4q9mW2yLdFMnK3dEHbrBjeZTYguaaIfusyojBgAGf5kF+O6KcWqiGzWqHk0LBsoolrp4VftEURhybg==
+ts-loader@^9.5.2:
+  version "9.5.2"
+  resolved "https://registry.yarnpkg.com/ts-loader/-/ts-loader-9.5.2.tgz#1f3d7f4bb709b487aaa260e8f19b301635d08020"
+  integrity sha512-Qo4piXvOTWcMGIgRiuFa6nHNm+54HbYaZCKqc9eeZCLRy3XqafQgwX2F7mofrbJG3g7EEb+lkiR+z2Lic2s3Zw==
   dependencies:
     chalk "^4.1.0"
     enhanced-resolve "^5.0.0"
